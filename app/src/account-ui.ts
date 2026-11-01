@@ -1,9 +1,13 @@
+import { tenantHeaders } from "./tenant-ui";
 import { TERMS_TEXT, TERMS_VERSION } from "./terms";
 async function api(path: string, method = "GET", body?: unknown) {
   const response = await fetch("/api/" + path, {
     method,
     credentials: "same-origin",
-    headers: body ? { "Content-Type": "application/json" } : undefined,
+    headers: {
+      ...tenantHeaders(),
+      ...(body ? { "Content-Type": "application/json" } : {}),
+    },
     body: body ? JSON.stringify(body) : undefined,
   });
   const value = await response.json();
@@ -83,23 +87,31 @@ export function mountAccount(root: HTMLElement) {
   const slot = root.querySelector("#account-controls");
   if (!slot) return;
   slot.innerHTML =
-    '<section class="card"><h2>Account privacy & private uploads</h2><p>Local checklist file indexing does not upload originals. Use this explicit upload control to send records to Sourcy Inc. Private uploads are limited to 25 MB each, 20 per account; redact unnecessary personal information first.</p><label class="check"><input id="privacy-training" type="checkbox">Allow future AI training of eligible uploaded data</label><label class="check"><input id="privacy-sale" type="checkbox">Allow future sale/licensing of eligible data to third parties for AI training</label><button id="privacy-save" class="btn">Save consent choices</button><label class="field">File to upload to Sourcy Inc<input id="private-file" type="file"></label><label class="check"><input id="upload-authority" type="checkbox">I have authority and any necessary permission from people described in this file, and have redacted unnecessary sensitive information.</label><button id="private-upload" class="btn">Upload selected file to Sourcy Inc</button><ul id="private-files"></ul><button id="account-logout" class="btn">Log out on all sessions</button> <button id="account-delete" class="btn danger">Delete account and active uploads</button><p id="privacy-status" role="status"></p></section>';
+    '<section class="card"><h2>Account privacy & private uploads</h2><p>Local checklist file indexing does not upload originals. Use this explicit upload control to send records to Sourcy Inc. Private uploads are limited to 25 MB each and count toward the selected tenant’s storage allowance; redact unnecessary personal information first.</p><label class="check"><input id="privacy-training" type="checkbox">Allow future AI training of eligible uploaded data</label><label class="check"><input id="privacy-sale" type="checkbox">Allow future sale/licensing of eligible data to third parties for AI training</label><button id="privacy-save" class="btn">Save consent choices</button><label class="field">File to upload to Sourcy Inc<input id="private-file" type="file"></label><label class="check"><input id="upload-authority" type="checkbox">I have authority and any necessary permission from people described in this file, and have redacted unnecessary sensitive information.</label><button id="private-upload" class="btn">Upload selected file to Sourcy Inc</button><ul id="private-files"></ul><button class="btn" id="more-private-files" hidden>More documents</button><button id="account-logout" class="btn">Log out on all sessions</button> <button id="account-delete" class="btn danger">Delete personal account</button><p id="privacy-status" role="status"></p></section>';
   const status = root.querySelector("#privacy-status")!;
   const report = (error: unknown) => {
     status.textContent =
       error instanceof Error ? error.message : "Request failed";
   };
-  const load = async () => {
+  let fileCursor: string | null = null;
+  const load = async (append = false) => {
     const state = await api("session");
     root.querySelector<HTMLInputElement>("#privacy-training")!.checked =
       Boolean(state.consents?.training);
     root.querySelector<HTMLInputElement>("#privacy-sale")!.checked = Boolean(
       state.consents?.sale,
     );
-    const files: { id: string; filename: string; size: number }[] =
-      await api("uploads");
+    const files: { id: string; filename: string; size: number }[] = await api(
+      "uploads" +
+        (append && fileCursor
+          ? "?after=" + encodeURIComponent(fileCursor)
+          : ""),
+    );
     const list = root.querySelector("#private-files")!;
-    list.replaceChildren();
+    if (!append) list.replaceChildren();
+    fileCursor = files.length === 100 ? files.at(-1)!.id : null;
+    root.querySelector<HTMLButtonElement>("#more-private-files")!.hidden =
+      !fileCursor;
     for (const file of files) {
       const li = document.createElement("li");
       li.textContent = file.filename + " (" + file.size + " bytes) ";
@@ -114,10 +126,32 @@ export function mountAccount(root: HTMLElement) {
           report(error);
         }
       };
-      li.append(button);
+      const download = document.createElement("button");
+      download.className = "btn";
+      download.textContent = "Download file";
+      download.onclick = async () => {
+        try {
+          const response = await fetch("/api/uploads/" + file.id, {
+            headers: tenantHeaders(),
+          });
+          if (!response.ok)
+            throw new Error("Download unavailable or tenant access revoked");
+          const url = URL.createObjectURL(await response.blob()),
+            a = document.createElement("a");
+          a.href = url;
+          a.download = file.filename;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        } catch (error) {
+          report(error);
+        }
+      };
+      li.append(download, button);
       list.append(li);
     }
   };
+  root.querySelector<HTMLElement>("#more-private-files")!.onclick = () =>
+    void load(true).catch(report);
   void load().catch(report);
   root.querySelector<HTMLButtonElement>("#privacy-save")!.onclick =
     async () => {
@@ -128,7 +162,7 @@ export function mountAccount(root: HTMLElement) {
           sale: root.querySelector<HTMLInputElement>("#privacy-sale")!.checked,
         });
         status.textContent =
-          "Consent choices saved. No model training or data sale is performed by this application.";
+          "Consent choices saved. Future eligible exports follow these choices. No model is automatically retrained.";
       } catch (error) {
         report(error);
       }
@@ -148,6 +182,7 @@ export function mountAccount(root: HTMLElement) {
           headers: {
             "X-File-Name": encodeURIComponent(file.name),
             "X-Upload-Authority": "confirmed",
+            ...tenantHeaders(),
           },
           body: file,
         });
@@ -172,7 +207,7 @@ export function mountAccount(root: HTMLElement) {
     async () => {
       if (
         !confirm(
-          "Delete your account and all active uploaded files? Local JSON exports and browser case storage are separate and will remain until you remove them.",
+          "Delete your account, all cases you own (including collaborators’ access) and all active uploaded files? Local JSON exports and browser case storage are separate and will remain until you remove them.",
         )
       )
         return;

@@ -14,7 +14,8 @@
     "APP_ORIGIN": "http://localhost:5173",
     "LOCAL_DEV": "true",
     "PRIVACY_EMAIL": "Team@sourcyinc.com",
-    "MAIL_FROM": "Sourcy Inc <Team@sourcyinc.com>"
+    "MAIL_FROM": "Sourcy Inc <Team@sourcyinc.com>",
+    "SOURCY_ADMIN_EMAILS": ""
   },
   "d1_databases": [
     {

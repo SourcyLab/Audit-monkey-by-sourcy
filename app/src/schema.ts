@@ -95,11 +95,52 @@ export const observationSchema = z
     evidence: short,
   })
   .strict();
+export const workflowSchema = z
+  .object({
+    carrier: short.default(""),
+    reviewCategory: z
+      .enum([
+        "unclassified",
+        "overtime",
+        "officer",
+        "subcontractor",
+        "classification",
+        "mod",
+        "gl-basis",
+        "other",
+      ])
+      .default("unclassified"),
+    outcome: z
+      .enum(["pending", "accepted", "partly-accepted", "rejected", "no-change"])
+      .default("pending"),
+    outcomeVerified: z.boolean().default(false),
+    outcomeSource: short.default(""),
+    policyNumber: short.default(""),
+    reference: short.default(""),
+    assignee: short.default(""),
+    reviewer: short.default(""),
+    stage: z
+      .enum([
+        "intake",
+        "preparing",
+        "reviewing",
+        "ready",
+        "submitted",
+        "closed",
+      ])
+      .default("intake"),
+    nextAction: short.default(""),
+    followUp: z.string().max(10).default(""),
+    internalNotes: z.string().max(20000).default(""),
+    updatedAt: z.string().max(40).default(""),
+  })
+  .strict();
 export const caseSchema = z
   .object({
     id: short,
     name: short,
     fictional: z.boolean(),
+    workflow: workflowSchema.default(() => workflowSchema.parse({})),
     line: z.enum(["wc", "gl"]),
     policy: policySchema,
     wc: z.array(wcRowSchema).max(500),

@@ -51,6 +51,7 @@ try {
   await page.goto(base);
   await page.getByRole("heading", { name: "Sign up or log in" }).waitFor();
   await axe("signup-contact-and-terms");
+  await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({
     path: "docs/screenshots/signup-desktop.png",
     fullPage: true,
@@ -92,6 +93,7 @@ try {
     ),
     null,
   );
+  await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({
     path: "docs/screenshots/overview-desktop.png",
     fullPage: true,
@@ -112,6 +114,7 @@ try {
     await page.locator('[data-path="evidence.0.status"]').inputValue(),
     "received",
   );
+  await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({
     path: "docs/screenshots/prepare-desktop.png",
     fullPage: true,
@@ -167,6 +170,7 @@ try {
   );
   await page.getByRole("heading", { name: "Follow the money" }).waitFor();
   assert.match(await page.locator("main").innerText(), /6,206.00/);
+  await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({
     path: "docs/screenshots/review-desktop.png",
     fullPage: true,
@@ -190,6 +194,26 @@ try {
     .getByRole("button", { name: "Dispute packet", exact: true })
     .click();
   await axe("packet");
+  const htmlWait = page.waitForEvent("download");
+  await page
+    .getByRole("button", { name: "Download printable report · HTML ↓" })
+    .click();
+  const htmlDownload = await htmlWait,
+    htmlStream = await htmlDownload.createReadStream(),
+    htmlParts = [];
+  for await (const part of htmlStream) htmlParts.push(part);
+  const printable = Buffer.concat(htmlParts).toString();
+  assert.match(printable, /Pre-submission checks remain/);
+  assert.match(printable, /Content-Security-Policy/);
+  assert.match(printable, /FICTIONAL EXAMPLE/);
+  const reportPage = await context.newPage();
+  await reportPage.setContent(printable);
+  await reportPage.emulateMedia({ media: "print" });
+  await reportPage.screenshot({
+    path: "docs/screenshots/findings-report.png",
+    fullPage: true,
+  });
+  await reportPage.close();
   const packetWait = page.waitForEvent("download");
   await page
     .getByRole("button", { name: "Download draft · Markdown ↓" })
@@ -197,6 +221,45 @@ try {
   assert.match((await packetWait).suggestedFilename(), /audit-dispute-draft/);
   await page.getByRole("button", { name: "Client cases", exact: true }).click();
   await axe("cases");
+  await page.locator("#save-server-case").click();
+  await page
+    .locator("#case-storage-status")
+    .filter({ hasText: "Case saved to backend" })
+    .waitFor();
+  await page
+    .getByText("Tenant owner settings & teammates", { exact: true })
+    .click();
+  await page
+    .locator("#case-member-email")
+    .fill("fictional-collaborator@example.test");
+  await page.locator("#invite-case-member").click();
+  await page
+    .locator("#case-member-list")
+    .filter({ hasText: "fictional-collaborator@example.test" })
+    .waitFor();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({
+    path: "docs/screenshots/staff-cases-desktop.png",
+    fullPage: true,
+  });
+  await page
+    .getByRole("button", { name: "Load saved case", exact: true })
+    .first()
+    .click();
+  await page
+    .locator("#status")
+    .filter({ hasText: "Saved case loaded" })
+    .waitFor();
+  await page.reload();
+  await page.getByRole("button", { name: "Client cases", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Load saved case", exact: true })
+    .first()
+    .click();
+  await page
+    .locator("#status")
+    .filter({ hasText: "Saved case loaded" })
+    .waitFor();
   await page.locator('[data-path="persist"]').check();
   await page.locator("#private-file").setInputFiles({
     name: "fictional-private-record.txt",
@@ -223,7 +286,7 @@ try {
   for await (const part of stream) parts.push(part);
   const exported = JSON.parse(Buffer.concat(parts).toString());
   assert.equal(exported.version, 1);
-  assert.equal(exported.cases.length, 1);
+  assert.equal(exported.cases.length, 2);
   await page.locator("#json-import").setInputFiles({
     name: "fixture.json",
     mimeType: "application/json",
@@ -250,6 +313,40 @@ try {
     .getByRole("heading", { name: "Turn the worksheet into answers." })
     .waitFor();
   assert.match(await page.locator("main").innerText(), /estimate is withheld/);
+  await page.locator('[data-path="workflow.stage"]').selectOption("ready");
+  assert.equal(
+    await page.locator('[data-path="workflow.stage"]').inputValue(),
+    "intake",
+  );
+  await page.locator("#status").filter({ hasText: "Not ready:" }).waitFor();
+  const csvWait = page.waitForEvent("download");
+  await page
+    .getByRole("button", { name: "Download WC CSV template", exact: true })
+    .click();
+  const csvDownload = await csvWait,
+    csvStream = await csvDownload.createReadStream(),
+    csvParts = [];
+  for await (const part of csvStream) csvParts.push(part);
+  const csvText = Buffer.concat(csvParts)
+    .toString()
+    .replace("Example employee", "Fictional CSV Employee");
+  await page
+    .locator("#exposure-csv")
+    .setInputFiles({
+      name: "fictional-exposure.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from(csvText),
+    });
+  await page.locator("#status").filter({ hasText: "CSV imported" }).waitFor();
+  assert.equal(
+    await page.locator('[data-path="wc.0.name"]').inputValue(),
+    "Fictional CSV Employee",
+  );
+  assert.equal(
+    await page.locator('[data-path="wc.0.recordsVerified"]').isChecked(),
+    false,
+  );
+  assert.equal(await page.locator('[data-path="wc.0.rate"]').inputValue(), "");
   await page
     .getByRole("button", { name: "Sources & guides", exact: true })
     .click();
@@ -268,6 +365,7 @@ try {
     true,
     "Mobile horizontal overflow",
   );
+  await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({
     path: "docs/screenshots/overview-mobile.png",
     fullPage: true,
@@ -283,6 +381,7 @@ try {
     true,
     "Mobile review horizontal overflow",
   );
+  await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({
     path: "docs/screenshots/review-mobile.png",
     fullPage: true,
@@ -304,10 +403,13 @@ try {
       "GL basis",
       "18-item checklist",
       "request download",
-      "packet download",
+      "packet and printable HTML report download",
+      "tenant case save, explicit teammate grant and browser-reload recovery",
       "JSON export/import",
       "invalid import",
       "new case incomplete",
+      "ready stage blocked until submission checks resolve",
+      "WC CSV template download/import requires fresh verification",
       "mobile overflow",
       "account-scoped browser storage prevents case inheritance",
     ],
@@ -315,6 +417,10 @@ try {
     runtimeErrors: errors,
     accessibility,
   };
+  await page.request.delete(base + "/api/tenants/members", {
+    headers: { Origin: new URL(base).origin },
+    data: { email: "fictional-collaborator@example.test" },
+  });
   const deleted = await page.request.delete(base + "/api/account", {
     headers: { Origin: new URL(base).origin },
   });

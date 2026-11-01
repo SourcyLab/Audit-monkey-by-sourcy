@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-01T23:13:55.119Z",
+  "browser": "156.0.8078.48",
+  "checks": [
+    "real browser contexts for tenant owner, teammate, outsider and allowlisted Sourcy admin",
+    "tenant switching and local workspace separation",
+    "shared saved case load and edit",
+    "stale save conflict visible in UI",
+    "tenant document download",
+    "owner-only teammate controls",
+    "cross-tenant direct API denied",
+    "revoked teammate denied and reload isolated",
+    "admin verified-cost input and 2x quote",
+    "restricted empty training export",
+    "mobile tenant layout",
+    "fictional account cleanup"
+  ],
+  "runtimeErrors": [],
+  "accessibility": [
+    {
+      "page": "sourcy-admin",
+      "violations": []
+    },
+    {
+      "page": "mobile-tenant-workspace",
+      "violations": []
+    }
+  ]
+}

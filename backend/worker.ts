@@ -1,3 +1,6 @@
+import { ensureTenant, tenantFor, tenantAPI } from "./tenants";
+import { adminAPI, sourcyAdmin } from "./admin";
+import { caseAPI } from "./cases";
 import {
   OAuthProvider,
   AuthorizationError,
@@ -257,6 +260,7 @@ async function app(req: Request, env: Bindings): Promise<Response> {
         now() + 86400,
       ),
     ]);
+    await ensureTenant(env.DB, { id: user.id, email: challenge.email });
     return new Response(JSON.stringify({ registered: true, userId: user.id }), {
       headers: {
         "Content-Type": "application/json",
@@ -273,9 +277,27 @@ async function app(req: Request, env: Bindings): Promise<Response> {
           userId: user.id,
           email: user.email,
           phone: user.phone,
+          sourcyAdmin: sourcyAdmin(user.email, env.SOURCY_ADMIN_EMAILS),
           consents: await consents(env, user.id),
         })
       : json({ registered: false }, 401);
+  }
+  if (path === "/api/tenants" || path.startsWith("/api/tenants/")) {
+    const user = await requireSession(req, env);
+    return tenantAPI(req, env.DB, user, () => data(req));
+  }
+  if (path.startsWith("/api/admin/")) {
+    const user = await requireSession(req, env);
+    return adminAPI(req, env.DB, user, env.SOURCY_ADMIN_EMAILS, () =>
+      data(req),
+    );
+  }
+  if (path === "/api/cases" || path.startsWith("/api/cases/")) {
+    const user = await requireSession(req, env),
+      tenant = await tenantFor(req, env.DB, user);
+    return caseAPI(req, env.DB, user, tenant, async () =>
+      JSON.parse(new TextDecoder().decode(await bounded(req, 1024 * 1024))),
+    );
   }
   if (path === "/api/privacy" && req.method === "PATCH") {
     const user = await requireSession(req, env);
@@ -309,7 +331,8 @@ async function app(req: Request, env: Bindings): Promise<Response> {
     });
   }
   if (path === "/api/uploads" && req.method === "POST") {
-    const user = await requireSession(req, env);
+    const user = await requireSession(req, env),
+      tenant = await tenantFor(req, env.DB, user);
     if (req.headers.get("X-Upload-Authority") !== "confirmed")
       return json(
         { error: "Confirm authority and redaction before uploading" },
@@ -324,15 +347,15 @@ async function app(req: Request, env: Bindings): Promise<Response> {
     const bytes = await bounded(req, 25 * 1024 * 1024);
     if (!bytes.length) return json({ error: "Empty file" }, 400);
     const id = crypto.randomUUID(),
-      key = user.id + "/" + id;
+      key = tenant.id + "/" + id;
     const reserved = await env.DB.prepare(
-      "INSERT INTO uploads SELECT ?,?,?,?,?,? WHERE (SELECT COUNT(*) FROM uploads WHERE user_id=?)<20 RETURNING id",
+      "INSERT INTO uploads(id,user_id,object_key,filename,size,created_at,tenant_id) VALUES(?,?,?,?,?,?,?) RETURNING id",
     )
-      .bind(id, user.id, key, filename, bytes.length, now(), user.id)
+      .bind(id, user.id, key, filename, bytes.length, now(), tenant.id)
       .first();
     if (!reserved)
       return json(
-        { error: "Upload quota reached; remove existing files first" },
+        { error: "Storage subscription required; contact Team@sourcyinc.com" },
         409,
       );
     try {
@@ -346,23 +369,49 @@ async function app(req: Request, env: Bindings): Promise<Response> {
     return json({ id, filename, size: bytes.length }, 201);
   }
   if (path === "/api/uploads" && req.method === "GET") {
-    const user = await requireSession(req, env);
+    const user = await requireSession(req, env),
+      tenant = await tenantFor(req, env.DB, user);
     return json(
       (
         await env.DB.prepare(
-          "SELECT id,filename,size,created_at FROM uploads WHERE user_id=? ORDER BY created_at",
+          "SELECT id,filename,size,created_at FROM uploads WHERE tenant_id=? AND id>? ORDER BY id LIMIT 100",
         )
-          .bind(user.id)
+          .bind(tenant.id, url.searchParams.get("after") || "")
           .all()
       ).results,
     );
   }
-  if (path.startsWith("/api/uploads/") && req.method === "DELETE") {
-    const user = await requireSession(req, env);
+  if (path.startsWith("/api/uploads/") && req.method === "GET") {
+    const user = await requireSession(req, env),
+      tenant = await tenantFor(req, env.DB, user);
     const item = await env.DB.prepare(
-      "SELECT object_key FROM uploads WHERE id=? AND user_id=?",
+      "SELECT object_key,filename FROM uploads WHERE id=? AND tenant_id=?",
     )
-      .bind(path.split("/").at(-1), user.id)
+      .bind(path.split("/").at(-1), tenant.id)
+      .first<{ object_key: string; filename: string }>();
+    if (!item) return json({ error: "Not found" }, 404);
+    const object = await env.UPLOADS.get(item.object_key);
+    if (!object) return json({ error: "File unavailable" }, 404);
+    return new Response(object.body, {
+      headers: {
+        "Content-Type": "application/octet-stream",
+        "Content-Disposition":
+          "attachment; filename*=UTF-8''" + encodeURIComponent(item.filename),
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'none'; sandbox",
+      },
+    });
+  }
+  if (path.startsWith("/api/uploads/") && req.method === "DELETE") {
+    const user = await requireSession(req, env),
+      tenant = await tenantFor(req, env.DB, user);
+    if (tenant.role !== "owner")
+      return json({ error: "Tenant owner access required" }, 403);
+    const item = await env.DB.prepare(
+      "SELECT object_key FROM uploads WHERE id=? AND tenant_id=?",
+    )
+      .bind(path.split("/").at(-1), tenant.id)
       .first<{ object_key: string }>();
     if (!item) return json({ error: "Not found" }, 404);
     await env.UPLOADS.delete(item.object_key);
@@ -373,6 +422,19 @@ async function app(req: Request, env: Bindings): Promise<Response> {
   }
   if (path === "/api/account" && req.method === "DELETE") {
     const user = await requireSession(req, env);
+    const shared = await env.DB.prepare(
+      "SELECT id FROM tenants WHERE owner_id=? AND EXISTS(SELECT 1 FROM tenant_members WHERE tenant_id=tenants.id AND email!=?)",
+    )
+      .bind(user.id, user.email)
+      .first();
+    if (shared)
+      return json(
+        {
+          error:
+            "Remove tenant teammate access before deleting the owner account. Shared case records must be preserved.",
+        },
+        409,
+      );
     let cursor: string | undefined;
     do {
       const grants = await env.OAUTH_PROVIDER!.listUserGrants(user.id, {
@@ -383,11 +445,35 @@ async function app(req: Request, env: Bindings): Promise<Response> {
       cursor = grants.cursor;
     } while (cursor);
     const rows = await env.DB.prepare(
-      "SELECT object_key FROM uploads WHERE user_id=?",
+      "SELECT object_key FROM uploads WHERE tenant_id IN (SELECT id FROM tenants WHERE owner_id=?)",
     )
       .bind(user.id)
       .all<{ object_key: string }>();
     for (const item of rows.results) await env.UPLOADS.delete(item.object_key);
+    await env.DB.prepare(
+      "DELETE FROM uploads WHERE tenant_id IN (SELECT id FROM tenants WHERE owner_id=?)",
+    )
+      .bind(user.id)
+      .run();
+    await env.DB.prepare(
+      "UPDATE uploads SET user_id=(SELECT owner_id FROM tenants WHERE id=uploads.tenant_id) WHERE user_id=?",
+    )
+      .bind(user.id)
+      .run();
+    await env.DB.prepare(
+      "DELETE FROM audit_cases WHERE tenant_id IN (SELECT id FROM tenants WHERE owner_id=?)",
+    )
+      .bind(user.id)
+      .run();
+    await env.DB.prepare("DELETE FROM tenant_members WHERE email=?")
+      .bind(user.email)
+      .run();
+    await env.DB.prepare("DELETE FROM tenants WHERE owner_id=?")
+      .bind(user.id)
+      .run();
+    await env.DB.prepare("DELETE FROM case_members WHERE email=?")
+      .bind(user.email)
+      .run();
     await env.DB.prepare("DELETE FROM users WHERE id=?").bind(user.id).run();
     return new Response("{}", {
       headers: {
@@ -534,6 +620,35 @@ export default {
           : req;
       return await oauth.fetch(effective, env, ctx);
     } catch (error) {
+      if (
+        error instanceof Error &&
+        String(error.cause || error.message).includes("tenant_costs.")
+      )
+        return json(
+          {
+            error:
+              "That cost source has already been recorded for this month and category. No duplicate cost was added.",
+          },
+          409,
+        );
+      if (
+        error instanceof Error &&
+        String(error.cause || error.message).includes(
+          "Storage subscription required",
+        )
+      )
+        return json(
+          {
+            error:
+              "50 GB free storage reached or subscription allowance exhausted. A paid subscription is required for additional storage; contact Team@sourcyinc.com.",
+          },
+          402,
+        );
+      if (
+        error instanceof Error &&
+        ["Tenant access denied", "Tenant suspended"].includes(error.message)
+      )
+        return json({ error: error.message }, 403);
       if (
         error instanceof AuthorizationError ||
         error instanceof CimdFetchError

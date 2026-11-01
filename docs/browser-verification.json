@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-01T22:25:12.801Z",
+  "date": "2026-11-01T23:13:48.883Z",
   "browser": "156.0.8078.48",
   "checks": [
     "required email/phone/current terms and local email-code flow",
@@ -13,10 +13,13 @@
     "GL basis",
     "18-item checklist",
     "request download",
-    "packet download",
+    "packet and printable HTML report download",
+    "tenant case save, explicit teammate grant and browser-reload recovery",
     "JSON export/import",
     "invalid import",
     "new case incomplete",
+    "ready stage blocked until submission checks resolve",
+    "WC CSV template download/import requires fresh verification",
     "mobile overflow",
     "account-scoped browser storage prevents case inheritance"
   ],
