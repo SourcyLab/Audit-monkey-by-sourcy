@@ -11,3 +11,5 @@ Principal runtime dependencies:
 Build/test tools include Vite, TypeScript, Vitest, ESLint, typescript-eslint, Playwright and axe-core. Their package license files and transitive notices remain in installed packages. `package-lock.json` records the full dependency graph. For redistribution, retain applicable package notices. No third-party license is replaced by this summary.
 
 The brand logo/favicon were retrieved from The Audit Monkey’s own website at the user’s instruction. Rights remain with their owner. NCCI, ISO/Verisk and AI provider names are references, not endorsements or certifications. Proprietary manuals, classifications, rates and value tables are not redistributed. Linked public source material is not included under the project’s CC license.
+
+Cloudflare workers-oauth-provider (MIT) supplies maintained OAuth protocol handling; Wrangler/Miniflare/workerd and workers-types retain their upstream licenses. None is a provider certification or legal approval.

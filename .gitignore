@@ -8,3 +8,10 @@ test-results/
 app/public/brand/
 .lock-stage/
 pnpm-lock.yaml
+
+.dev.vars
+.wrangler/
+backend/build/
+.backend-lock/
+/build/
+backend/backend/

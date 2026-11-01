@@ -121,3 +121,7 @@ Replace `ABSOLUTE_REPO_PATH` and, if necessary, `node` with their real absolute 
 No provider endorsements or certification badges are used. No deployment or marketplace submission occurred.
 
 Not legal, tax or insurance advice. No agent, CPA or client relationship is created. Verify with your carrier, NCCI and a licensed professional.
+
+## New authenticated Worker transport
+
+The browser now requires Sourcy Inc contact/terms signup. The Worker backend exposes OAuth-protected /mcp using the same shared factory as stdio. See [backend auth and setup](../backend/README.md) for discovery, login, PKCE, scopes, storage and honest provider-status notes, including Muse Code. The stdio process and the older loopback HTTP test transport remain supplied-data calculators/public guides only; they do not expose accounts or stored uploads. Public deployment and live provider acceptance have not occurred.

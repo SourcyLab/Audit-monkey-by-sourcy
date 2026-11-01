@@ -1,9 +1,21 @@
 import js from "@eslint/js";
 import ts from "typescript-eslint";
 export default ts.config(js.configs.recommended, ...ts.configs.recommended, {
-  files: ["app/src/**/*.ts", "mcp/**/*.ts"],
+  files: [
+    "app/src/**/*.ts",
+    "mcp/**/*.ts",
+    "backend/worker.ts",
+    "backend/mcp.ts",
+    "tests/**/*.ts",
+  ],
   languageOptions: {
     globals: {
+      fetch: "readonly",
+      Response: "readonly",
+      Request: "readonly",
+      TextEncoder: "readonly",
+      TextDecoder: "readonly",
+      AbortSignal: "readonly",
       Buffer: "readonly",
       structuredClone: "readonly",
       setTimeout: "readonly",

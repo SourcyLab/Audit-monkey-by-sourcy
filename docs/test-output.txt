@@ -2,12 +2,15 @@
  RUN  v5.0.5 <repo>
 
  ✓ app/src/ai.test.ts > runs before-audit missing item guidance with no AI 5ms
- ✓ app/src/ai.test.ts > runs after-audit findings and dispute output with no AI 2ms
- ✓ app/src/ai.test.ts > never sends a request while disabled, even with a key 1ms
- ✓ app/src/ai.test.ts > uses a caller key with openai-compatible only after opt-in 15ms
+ ✓ app/src/ai.test.ts > runs after-audit findings and dispute output with no AI 3ms
+ ✓ app/src/ai.test.ts > never sends a request while disabled, even with a key 2ms
+ ✓ app/src/ai.test.ts > uses a caller key with openai-compatible only after opt-in 18ms
  ✓ app/src/ai.test.ts > uses a caller key with anthropic only after opt-in 2ms
  ✓ app/src/ai.test.ts > handles provider failure without changing the local engine 1ms
- ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > allocates payroll by class and rate per $100 5ms
+ ✓ app/src/registration.test.ts > requires email, phone and an affirmative current-terms decision 4ms
+ ✓ app/src/registration.test.ts > does not treat the old disclaimer acknowledgment as registration or consent 0ms
+ ✓ app/src/registration.test.ts > does not infer training or sale permission from accepting general terms 0ms
+ ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > allocates payroll by class and rate per $100 7ms
  ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > removes only the premium portion of overtime 0ms
  ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > applies verified officer maximum and minimum for the entered period 0ms
  ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > withholds final when officer limits are missing 0ms
@@ -34,20 +37,32 @@
  ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > rounds final cents, not every intermediate operation 0ms
  ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > quantifies OT independently, keeps total scenario comparison separate 0ms
  ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > shows minimum premium can erase an exposure saving 0ms
- ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > rejects malformed imports, huge values and negative amounts 6ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > rejects malformed imports, huge values and negative amounts 7ms
  ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > starts real cases with unknown values and produces clearly incomplete drafts 0ms
  ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > distinguishes standalone impacts and avoids claiming records are attached 0ms
- ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > initializes and discovers eight typed tools with safe annotations 18ms
- ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > calls WC and GL through MCP with structured calculation results 5ms
+ ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > initializes and discovers eight typed tools with safe annotations 21ms
+ ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > calls WC and GL through MCP with structured calculation results 6ms
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > rejects invalid inputs rather than silently converting them 1ms
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > returns checklist and source rules with disclaimers 2ms
- ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > searches and fetches public guides without arbitrary file access 3ms
+ ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > searches and fetches public guides without arbitrary file access 1ms
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > publishes resources and a preparation prompt 4ms
- ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > reviews supplied case data and returns a draft without submitting it 2ms
- ✓ mcp/server.test.ts > real MCP transports > negotiates over an actual stdio subprocess with clean stdout 428ms
- ✓ mcp/server.test.ts > real MCP transports > negotiates local Streamable HTTP and blocks hostile origins and hosts 62ms
+ ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > reviews supplied case data and returns a draft without submitting it 3ms
+ ✓ mcp/server.test.ts > real MCP transports > negotiates over an actual stdio subprocess with clean stdout 502ms
+ ✓ mcp/server.test.ts > real MCP transports > negotiates local Streamable HTTP and blocks hostile origins and hosts 67ms
+ ✓ tests/backend.test.ts > requires verified email, phone and explicit current terms; legacy acknowledgments cannot bypass 99ms
+ ✓ tests/backend.test.ts > isolates private uploads, records explicit consent changes and deletes active files/account 182ms
+ ✓ tests/backend.test.ts > rejects cross-origin writes and code brute force 50ms
+ ✓ tests/backend.test.ts > publishes OAuth/PKCE discovery and challenges unauthenticated MCP calls 8ms
+stderr | tests/backend.test.ts > performs DCR, browser-bound consent, S256 code exchange, authenticated MCP and revocation
+OAuth error response: 400 invalid_grant - Authorization code already used
 
- Test Files  3 passed (3)
-      Tests  45 passed (45)
-   Start at  16:53:21
-   Duration  1.04s (tests 45%, import 42%, transform 12%, worker 1%)
+stderr | tests/backend.test.ts > performs DCR, browser-bound consent, S256 code exchange, authenticated MCP and revocation
+OAuth error response: 401 invalid_token - Invalid access token
+
+ ✓ tests/backend.test.ts > performs DCR, browser-bound consent, S256 code exchange, authenticated MCP and revocation 147ms
+ ✓ tests/backend.test.ts > rejects unsafe redirects, plain PKCE and wrong resource, and supports explicit denial 81ms
+
+ Test Files  5 passed (5)
+      Tests  54 passed (54)
+   Start at  17:23:26
+   Duration  1.77s (tests 65%, import 30%, transform 4%, worker 1%)

@@ -4,111 +4,91 @@
 
 ![The Audit Monkey](brand/audit-monkey-wordmark-light.svg)
 
-A free tool for preparing, reviewing and questioning workers’ compensation and general liability premium audits. Florida first, with a separate NCCI state module and a separate GL engine. Built for an insured’s audit preparation and staff case review, subject to the noncommercial licensing terms below.
+A Florida-first workers’ compensation and general liability premium-audit workspace, by [Sourcy](https://sourcyinc.com). Prepare records, find missing items, follow audit math and download an evidence-backed findings/dispute draft. No refund is guaranteed.
 
-**Keep the records. Follow the math. Ask for a supported correction.** A correction may lower additional premium or increase a return; it may also reveal that more premium is owed. No savings are guaranteed.
+## One-command local run
 
-## Quick start
-
-Use Node **22.13+ or 24+** and npm. From this repository’s root:
+Use Node 24 and npm. From this repository on initial-build:
 
 ```sh
-npm ci
-npm run dev
+npm start
 ```
 
-Open the loopback address printed by Vite (normally `http://127.0.0.1:5173`). The first case is a clearly labeled fictional demo with made-up rates and class labels. Select **New case** for your own inputs. No keys or accounts are needed.
+Open **http://localhost:8787**. This performs npm ci, builds the static app, creates an ignored local development secret, applies local D1 migrations and launches the Cloudflare Worker with simulated D1/R2/KV. It creates no cloud resources and does not deploy.
+
+Enter a fictional email, phone and accept the current terms. In local development only, the sign-in code is displayed in the browser; no email is sent. Development mode refuses public hostnames. Use fictional records only. The first audit case is a fictional demo with made-up rates/classes. New case starts your own worksheet. See [backend setup and limits](backend/README.md).
+
+## Accounts, terms and privacy
+
+The browser workspace now requires email, phone, current-terms acceptance and a sign-in code. The old disclaimer acknowledgment cannot bypass registration. In production, a configured email service must verify email ownership; phone ownership is not verified. Operator: **Sourcy Inc**. Privacy, withdrawal and deletion contact: **Team@sourcyinc.com**.
+
+[Terms and data-use notice](app/src/terms.ts) plainly disclose optional AI-training and third-party training-sale/licensing uses. Those permissions are separate, unchecked choices, never inferred from accepting general terms or OAuth scopes. Declining them does not block audit tools. No training, sale, buyer export or marketing pipeline is enabled. Permission cannot override employees’/subcontractors’ rights or legal restrictions. The terms and operational policies need legal review before public collection.
+
+Accounts, consent history and sessions are stored in D1; explicitly uploaded originals are private R2 objects. Local record indexing only records filenames in your case. **Only the separate Upload selected file to Sourcy Inc action transmits an original**, after authority/redaction confirmation. Private upload limits: 25 MB each, 20 per account. No public file links or cross-user file tools are provided.
+
+Privacy controls in Client cases let users change/withdraw optional permissions, delete uploaded originals, log out all website sessions or delete the account and active uploads. Account deletion also revokes OAuth grants. There is no automatic training or third-party transfer to undo. Future training/transfer practices, retention and infrastructure backup deletion must be finalized before launch. No promise that completed model training can be reversed is made.
+
+Audit cases stay in browser memory unless you export JSON or enable unencrypted browser storage. Saved workspaces are scoped to the authenticated account; another account does not automatically inherit them. Local JSON/browser copies remain independent of backend deletion. Avoid browser storage on shared devices and protect exports. No real customer data or secrets belong in this repository.
+
+## Both audit modes work without AI
+
+- **Prepare:** full-policy, audit-instructions, P&L, payroll, GL, four 941s, 940, RT-6, W-2/W-3, 1099, sub COI, individual exemption, OT, officer-cap, excluded-pay/sales, mod and GL-basis checklist. Each item explains where to obtain it, who to ask and its potential effect. Statuses distinguish missing/requested/received/verified/not applicable. Request-letter downloads are included.
+- **Review:** browser PDF.js text extraction or manual entry; WC/GL class/exposure rules, explicit rates and denominators, documented OT premium, officer minima/maxima and exemptions, insured-sub adjustments, mod periods, premium steps, minimums, assessments, proration checks and deposit-versus-final balance.
+- **Respond:** downloadable findings, evidence index, proposed worksheet and dispute/re-audit letter draft. Nothing is submitted automatically. Carrier/re-audit/NCCI WC/DFS/OIR routes are documented; unknown deadlines remain TODO.
+- **Cases:** multiple clients, schema-validated JSON export/import and account-scoped optional browser storage.
+- **Guides:** [prepare](guides/prepare.md), [review](guides/review.md), [dispute](guides/dispute.md), [WC](guides/wc.md), [GL](guides/gl.md), [Florida](guides/states/fl.md), [glossary](guides/glossary.md), [templates](guides/templates/README.md), [AI prompts](prompts/README.md).
+
+PDFs extract text only: financial inputs must be verified and entered manually. Scans need separate OCR. The tool does not independently decide classifications, coverage, authority or an allowed exclusion. Enter verified policy rates; no carrier rates or proprietary NCCI/ISO tables are shipped. Caps, assessment values and deadlines remain TODO until verified. See [calculation model](docs/calculation-model.md).
+
+## Optional BYOK AI
+
+AI is off by default. Under Sources & guides select OpenAI-compatible or Anthropic, enter your own endpoint/model/key, review selected text, then press Send. Keys/settings stay in session memory, are not hosted, saved or exported, and clear on reload. Provider calls may incur charges and send selected text under that provider’s terms. They are separate from Sourcy Inc's training/sale permissions. No background provider requests occur. Provider/CORS errors leave local audit tools available.
+
+## MCP login and compatibility
+
+The same eight engine/guide tools are available through a separately launched stdio server or the Worker’s authenticated /mcp endpoint. The remote endpoint uses Cloudflare’s maintained OAuth provider: OAuth discovery, protected-resource metadata, authorization code with S256 PKCE, DCR/CIMD support, exact resource audience, browser-bound Allow/Deny consent, issuer responses, refresh rotation and revocation. Website login supplies user identity; clients receive scoped OAuth tokens, never the website session cookie. audit:read grants calculations/public guides, not contacts, private uploads, training or sales rights.
 
 ```sh
-npm run lint
-npm test
-npm run build
-npm run preview
+npm run mcp:stdio
 ```
 
-The compiled static app is in `app/dist/`. These commands do not deploy anything. CI runs lint, type checking, all engine/MCP tests and the production build.
+[MCP client configuration](mcp/README.md) and [backend authentication notes](backend/README.md) distinguish implementation from actual host acceptance. ChatGPT, Claude, Cursor and Gemini have documented remote OAuth/MCP flows. Muse here means Meta Muse Code: MCP support is documented, but its exact remote OAuth acceptance contract is not verified. Local stdio remains available. No provider certification, public listing or real-client acceptance is claimed. Cloud-hosted clients need an approved reachable HTTPS endpoint or supported tunnel; localhost alone is not a public ChatGPT connector. Nothing has been deployed.
 
-## What is included
+## Screenshots · fictional data
 
-- **Prepare:** 18 evidence categories covering the full policy, audit instructions, P&L, payroll registers, GL, four 941s, 940, Florida RT-6, W-2/W-3, 1099s, dated sub COIs, individual exemptions, overtime detail, officer limits, excluded pay/sales, mod worksheets and GL bases. Each identifies who to ask, what to obtain and why it matters. Carrier, accountant and subcontractor request drafts are downloadable.
-- **Review:** local PDF text extraction with PDF.js or manual worksheet entry; WC and GL class rows; rate denominators; documented deductions; officer minimum/maximum and exemption checks; insured-sub treatment; mod effective periods; ordered credits, minimum premium, expense constants and assessments; deposit-versus-final reconciliation.
-- **Findings:** verification gaps, manual class/basis/period questions, independently repriced adjustment estimates and an overall carrier-versus-proposed comparison. Effects may overlap and are not additive.
-- **Respond:** a downloadable Markdown draft containing the cover letter, findings, evidence index, proposed worksheet, worksheet/re-audit requests and escalation notes. Nothing is sent or filed automatically. Deadline values remain TODO until confirmed for the policy.
-- **Case workspace:** multiple clients, JSON export/import with schema validation, session-only operation by default, and optional unencrypted browser storage.
-- **Guides:** original [prepare](guides/prepare.md), [review](guides/review.md), [dispute](guides/dispute.md), [WC](guides/wc.md), [GL](guides/gl.md), [Florida](guides/states/fl.md), [glossary](guides/glossary.md), [templates](guides/templates/README.md) and [AI prompts](prompts/README.md).
-- **MCP:** an optional, separately launched local server exposing eight tools, seven public guide resources and a preparation prompt. See [client setup and provider requirements](mcp/README.md) for ChatGPT, Cursor, Claude, Gemini and Meta.
+![Signup and terms](docs/screenshots/signup-desktop.png)
 
-## Screenshots
+<details><summary>Before and after audit</summary>
 
-All screenshots use fictional data and the approved assets from commit 39f12ed. See [brand provenance](brand/README.md).
-
-![Desktop audit workspace](docs/screenshots/overview-desktop.png)
-
-<details>
-<summary>Mobile workspace and editable review</summary>
-
-![Before-audit preparation](docs/screenshots/prepare-desktop.png)
-![Mobile audit workspace](docs/screenshots/overview-mobile.png)
-![Editable audit review](docs/screenshots/review-desktop.png)
+![Prepare](docs/screenshots/prepare-desktop.png)
+![Review](docs/screenshots/review-desktop.png)
+![Mobile](docs/screenshots/overview-mobile.png)
 
 </details>
 
-## Privacy and limitations
-
-With AI off, the **web app** has no backend, accounts, API keys, analytics, remote fonts or external data services. PDF text extraction uses a locally bundled worker. Documents and case data are not uploaded. External source/help/credit links open only when you choose them and do not include case data.
-
-Cases remain in memory until you export JSON or enable **Remember cases on this browser**. Browser storage and exported files are unencrypted. Turning browser storage off removes that saved workspace; exported copies remain wherever you put them. The first-run acknowledgment is a separate small local preference. On a shared device, keep browser storage off and handle exports securely. No secrets or real customer data belong in this repository.
-
-The **MCP process** is separate from the web app. It does not read browser cases, persist data or make outbound calls. A connected AI client sees supplied inputs and outputs and may send them to its provider. Read its privacy terms before sharing data. Stdio and a loopback-only Streamable HTTP development transport are implemented and tested. **No provider approval, public directory listing, remote deployment or consumer-chat integration is claimed.** ChatGPT public review requires a real hosted endpoint and other account/review requirements; Meta’s connector route has preview-program requirements. These are optional future publication steps, not blockers or requirements for this BYOK release.
-
-PDF extraction reads text, not visual meaning. It does not infer class codes or automatically populate financial inputs. Scanned PDFs require separately performed OCR or manual entry. Limits: 25 MB / 200 PDF pages, 200,000 extracted characters, 5 MB JSON imports, 100 cases per imported workspace. Files that fail validation are rejected. The tool does not classify a business or decide insurance coverage.
-
-Enter your own verified rates. No carrier rates, NCCI officer values, proprietary ISO tables or assumed Florida assessment percentages are shipped. Unknown values are **TODO**, not facts. The engine requires confirmation of the premium sequence and withholds final estimates for missing verification. Special programs, maritime/PEO issues, cancellation short-rate rules and unusual assessment bases may require separate reconciliation by a licensed professional. See [calculation behavior](docs/calculation-model.md).
-
-## Architecture
-
-```text
-app/src/engine/       Pure typed WC, GL, premium-sequence and review functions
-app/src/states/fl.ts  State interface implementation and primary source register
-app/src/schema.ts    Shared JSON and MCP validation
-app/src/main.ts      Accessible browser workspace
-app/src/pdf.ts       Browser-only PDF.js text extraction
-app/src/brand.ts     One brand asset/link configuration
-app/src/tokens.css   Central color tokens
-brand/               Source logo, favicon and provenance
-mcp/                 Optional stdio / local HTTP server, protocol tests, client docs
-guides/              CC BY-NC guides and request templates
-prompts/             CC BY-NC copy-paste prompts
-```
-
-Source links include the [NCCI Basic Manual / Atlas](https://www.ncci.com/Pages/Atlas.aspx), [F.S. 440.381](https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0400-0499/0440/Sections/0440.381.html), [Florida DWC](https://www.myfloridacfo.com/division/wc/employer/exemptions) and [ISO / Verisk background](https://www.verisk.com/4a5f82/siteassets/media/downloads/iso/paas/paas-professional-development-catalog.pdf). **Verify current values and policy-effective editions.** Some manuals require licensed access. This project does not redistribute them or imply affiliation.
-
-## Validation and contributing
-
-See [verification evidence](docs/verification.md), [browser report](docs/browser-verification.json) and [CONTRIBUTING.md](CONTRIBUTING.md). The math suite covers WC allocation, OT, officer limits, exemptions, uninsured-sub reversal, effective-date mods, GL bases, premium sequencing, proration, minimums and balance/return. MCP tests exercise initialization, discovery, calls, invalid inputs, resources/prompts, stdio and local HTTP Host/Origin enforcement.
-
-Optional browser checks:
+## Development and checks
 
 ```sh
-npx playwright install chromium
-# In a separate terminal, run npm run dev first
-npm run test:browser
+npm ci
+npm run lint
+npm test
+npm run build
+npm run build:api
+npm run dev:api
 ```
 
-For an installed browser, set `AUDIT_BROWSER_PATH` to its executable. Set `AUDIT_BASE_URL` if Vite uses another loopback port. The script uses fictional data and generates screenshots plus an axe WCAG 2.1 A/AA report. Automated scans do not establish complete WCAG conformance; manual keyboard and visual review remain necessary.
+npm test builds the app and a dry-run Worker bundle first, then runs engine, provider, registration, actual stdio/HTTP and isolated D1/R2/OAuth tests. No remote credentials or actual emails are used. For browser verification run the local Worker first, then set AUDIT_BASE_URL=http://localhost:8787 and run npm run test:browser. Set AUDIT_BROWSER_PATH to an installed Chrome executable or install Playwright Chromium. Tests and screenshots use fictional data.
 
-## Licenses and disclaimer
+[Verification evidence](docs/verification.md) · [verbose output](docs/test-output.txt) · [browser report](docs/browser-verification.json) · [CONTRIBUTING](CONTRIBUTING.md). CI performs lint/type checks, all tests and builds. Automated axe checks plus focused keyboard/mobile inspection are not comprehensive accessibility certification.
 
-- Original code: [PolyForm Noncommercial 1.0.0](LICENSE).
-- Original guides, prompts and templates: [CC BY-NC 4.0](guides/LICENSE), including `/prompts` and `/guides/templates`. Attribute The Audit Monkey, by Sourcy, link to the source/license and identify modifications.
-- Free for personal and noncommercial use under those terms. **Commercial use needs permission**, including business/staff workflows where they constitute commercial use. “Free” is not a blanket commercial-use license. Contact [Sourcy](https://sourcyinc.com) for permission. Brand marks and third-party dependencies retain their respective rights; see [third-party notes](THIRD_PARTY_NOTICES.md).
+The app and pure engine are under app/src; state rules/sources are in app/src/states/fl.ts; backend/ contains Worker/D1/R2/OAuth code; mcp/factory.ts is shared by transports; branding uses app/src/brand.ts and app/src/tokens.css. [Approved assets](brand/README.md) are from commit 39f12ed.
+
+## Licenses and source notes
+
+Original code: [PolyForm Noncommercial 1.0.0](LICENSE). Original docs/guides/prompts/templates: [CC BY-NC 4.0](docs/LICENSE), also at [guides/LICENSE](guides/LICENSE). Free for personal and noncommercial use; commercial use needs permission. Attribute The Audit Monkey, by Sourcy, link to source/license and identify changes. Third-party dependencies and brand marks retain their rights; see [notices](THIRD_PARTY_NOTICES.md).
+
+Verify current values and policy-effective editions using the [NCCI Basic Manual/Atlas](https://www.ncci.com/Pages/Atlas.aspx), [F.S. 440.381](https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0400-0499/0440/Sections/0440.381.html), [Florida DWC](https://www.myfloridacfo.com/division/wc/employer/exemptions) and the applicable ISO/manual rules through your licensed professional. Proprietary manuals are not redistributed.
 
 **Not legal, tax or insurance advice. No agent, CPA or client relationship is created. Verify with your carrier, NCCI and a licensed professional.**
 
 [by Sourcy](https://sourcyinc.com) · [Get paid help](https://theauditmonkey.com)
-
-## Optional AI settings
-
-AI is off by default. Under Sources & guides, enable it for this session, select OpenAI-compatible or Anthropic, enter your own endpoint, model ID and key, and review the exact selected text before pressing Send. Keys/settings stay only in memory: no hosted keys, saved keys, .env bundling or inclusion in JSON exports. Reload or Clear disables AI. Provider requests can cost money and send text to that provider. CORS/network/provider errors do not affect either local audit mode. No provider approvals or deployment are required for this release. MCP remains an optional local integration.
-
-Documentation under docs/, guides/, prompts/ and templates is CC BY-NC 4.0; see docs/LICENSE and guides/LICENSE. The original code remains PolyForm Noncommercial 1.0.0.

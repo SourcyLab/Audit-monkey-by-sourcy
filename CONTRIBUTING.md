@@ -14,7 +14,7 @@ npm run build
 npm run dev
 ```
 
-Loopback HTTP tests require permission for local sockets. Do not skip them and then report the suite as passing. Run CI and retain failures with their context. For browser verification use the fictional case, test keyboard navigation, narrow screens, first-run notice, errors, export/import and local PDF extraction. No deployment is part of these commands.
+Loopback HTTP tests require permission for local sockets. Do not skip them and then report the suite as passing. Run CI and retain failures with their context. For browser verification use the fictional case, test keyboard navigation, narrow screens, first-run notice, errors, export/import and local PDF extraction. No deployment is part of these commands. npm test includes the local Worker dry-run build and D1/R2/OAuth tests.
 
 ## Add a state module
 
@@ -43,3 +43,7 @@ Replace source files in `/brand`, update `brand/README.md` provenance, and adjus
 ## Licenses
 
 Code: PolyForm Noncommercial 1.0.0. Original guides, prompts and templates: CC BY-NC 4.0. Submit only material you may license under the relevant terms. Attribute third-party material and preserve dependency notices. Commercial use needs permission; a public repository does not grant a commercial license.
+
+## Accounts and consent
+
+Use fictional contacts and files in local development. Never weaken email-code attempt/replay checks, origin checks, OAuth scope/audience validation or owner isolation. Update terms versions for material changes and obtain fresh user decisions; never infer training or sale consent from general terms or OAuth authorization. Keep secrets and Wrangler local storage ignored. Production email, retention, buyer/recipient uses and public hosting require separate review and authorization.

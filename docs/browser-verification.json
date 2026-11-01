@@ -1,8 +1,10 @@
 {
-  "date": "2026-11-01T21:51:29.719Z",
+  "date": "2026-11-01T22:25:12.801Z",
   "browser": "156.0.8078.48",
   "checks": [
-    "first-run",
+    "required email/phone/current terms and local email-code flow",
+    "training and sale consent not preselected",
+    "explicit private upload after authority confirmation",
     "before-audit local record intake",
     "AI off by default and no request on disabled Send",
     "local PDF extraction",
@@ -15,13 +17,14 @@
     "JSON export/import",
     "invalid import",
     "new case incomplete",
-    "mobile overflow"
+    "mobile overflow",
+    "account-scoped browser storage prevents case inheritance"
   ],
   "externalRequests": [],
   "runtimeErrors": [],
   "accessibility": [
     {
-      "page": "first-run",
+      "page": "signup-contact-and-terms",
       "violations": []
     },
     {

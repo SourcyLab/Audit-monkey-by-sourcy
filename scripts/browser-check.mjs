@@ -3,7 +3,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { mkdir, writeFile } from "node:fs/promises";
 import assert from "node:assert/strict";
 
-const base = process.env.AUDIT_BASE_URL ?? "http://127.0.0.1:5173";
+const base = process.env.AUDIT_BASE_URL ?? "http://localhost:8787";
 const browser = await chromium.launch({
   headless: true,
   ...(process.env.AUDIT_BROWSER_PATH
@@ -49,10 +49,33 @@ async function axe(label) {
 }
 try {
   await page.goto(base);
-  await page.getByRole("dialog").waitFor();
-  await axe("first-run");
+  await page.getByRole("heading", { name: "Sign up or log in" }).waitFor();
+  await axe("signup-contact-and-terms");
+  await page.screenshot({
+    path: "docs/screenshots/signup-desktop.png",
+    fullPage: true,
+  });
   await page
-    .getByRole("button", { name: "I understand · open workspace →" })
+    .locator("#account-email")
+    .fill("fictional-browser-" + Date.now() + "@example.test");
+  await page.locator("#account-phone").fill("+12025550123");
+  assert.equal(await page.locator("#account-training").isChecked(), false);
+  assert.equal(await page.locator("#account-sale").isChecked(), false);
+  await page.locator("#account-terms-accepted").check();
+  await page
+    .getByRole("button", { name: "Send sign-in code", exact: true })
+    .click();
+  await page
+    .locator("#account-status")
+    .filter({ hasText: "LOCAL DEVELOPMENT ONLY" })
+    .waitFor();
+  const code = (await page.locator("#account-status").innerText()).match(
+    /code: (\d{8})/,
+  )?.[1];
+  assert.ok(code);
+  await page.locator("#account-code").fill(code);
+  await page
+    .getByRole("button", { name: "Verify and open workspace", exact: true })
     .click();
   assert.equal(
     await page
@@ -76,13 +99,11 @@ try {
   await page.getByRole("button", { name: "Prepare my audit" }).click();
   await axe("prepare");
   assert.equal(await page.locator(".check-card").count(), 18);
-  await page
-    .locator('[data-evidence-file="0"]')
-    .setInputFiles({
-      name: "fictional-policy.txt",
-      mimeType: "text/plain",
-      buffer: Buffer.from("Fictional record"),
-    });
+  await page.locator('[data-evidence-file="0"]').setInputFiles({
+    name: "fictional-policy.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from("Fictional record"),
+  });
   assert.match(
     await page.locator('[data-path="evidence.0.note"]').inputValue(),
     /fictional-policy.txt/,
@@ -176,6 +197,22 @@ try {
   assert.match((await packetWait).suggestedFilename(), /audit-dispute-draft/);
   await page.getByRole("button", { name: "Client cases", exact: true }).click();
   await axe("cases");
+  await page.locator('[data-path="persist"]').check();
+  await page.locator("#private-file").setInputFiles({
+    name: "fictional-private-record.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from("Fictional private upload"),
+  });
+  await page.locator("#upload-authority").check();
+  await page.locator("#private-upload").click();
+  await page
+    .locator("#privacy-status")
+    .filter({ hasText: "File uploaded privately" })
+    .waitFor();
+  await page
+    .locator("#private-files")
+    .filter({ hasText: "fictional-private-record.txt" })
+    .waitFor();
   const exportWait = page.waitForEvent("download");
   await page
     .getByRole("button", { name: "Export workspace JSON", exact: true })
@@ -256,7 +293,9 @@ try {
     date: new Date().toISOString(),
     browser: browser.version(),
     checks: [
-      "first-run",
+      "required email/phone/current terms and local email-code flow",
+      "training and sale consent not preselected",
+      "explicit private upload after authority confirmation",
       "before-audit local record intake",
       "AI off by default and no request on disabled Send",
       "local PDF extraction",
@@ -270,11 +309,47 @@ try {
       "invalid import",
       "new case incomplete",
       "mobile overflow",
+      "account-scoped browser storage prevents case inheritance",
     ],
     externalRequests: external,
     runtimeErrors: errors,
     accessibility,
   };
+  const deleted = await page.request.delete(base + "/api/account", {
+    headers: { Origin: new URL(base).origin },
+  });
+  assert.equal(deleted.status(), 200);
+  await page.reload();
+  await page
+    .locator("#account-email")
+    .fill("fictional-second-" + Date.now() + "@example.test");
+  await page.locator("#account-phone").fill("+12025550124");
+  await page.locator("#account-terms-accepted").check();
+  await page
+    .getByRole("button", { name: "Send sign-in code", exact: true })
+    .click();
+  await page
+    .locator("#account-status")
+    .filter({ hasText: "LOCAL DEVELOPMENT ONLY" })
+    .waitFor();
+  const secondCode = (await page.locator("#account-status").innerText()).match(
+    /code: (\d{8})/,
+  )?.[1];
+  assert.ok(secondCode);
+  await page.locator("#account-code").fill(secondCode);
+  await page
+    .getByRole("button", { name: "Verify and open workspace", exact: true })
+    .click();
+  await page.locator("#case-select").waitFor();
+  assert.equal(
+    await page.locator("#case-select option").count(),
+    1,
+    "Another account inherited saved cases",
+  );
+  await page.request.delete(base + "/api/account", {
+    headers: { Origin: new URL(base).origin },
+  });
+
   await writeFile(
     "docs/browser-verification.json",
     JSON.stringify(report, null, 2) + "\n",

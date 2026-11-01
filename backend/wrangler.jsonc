@@ -1,0 +1,54 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "audit-monkey-by-sourcy-api",
+  "main": "worker.ts",
+  "compatibility_date": "2026-10-30",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "workers_dev": false,
+  "preview_urls": false,
+  "vars": {
+    "PUBLIC_ORIGIN": "http://localhost:8787",
+    "APP_ORIGIN": "http://localhost:5173",
+    "LOCAL_DEV": "true",
+    "PRIVACY_EMAIL": "Team@sourcyinc.com",
+    "MAIL_FROM": "Sourcy Inc <Team@sourcyinc.com>"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "audit-monkey-local",
+      "database_id": "00000000-0000-0000-0000-000000000001",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "UPLOADS",
+      "bucket_name": "audit-monkey-private-uploads"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "OAUTH_KV",
+      "id": "00000000000000000000000000000001"
+    }
+  ],
+  "assets": {
+    "directory": "../app/dist",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*",
+      "/authorize",
+      "/oauth/*",
+      "/.well-known/*",
+      "/mcp",
+      "/mcp/*"
+    ]
+  },
+  "observability": {
+    "enabled": false
+  }
+}

@@ -1,3 +1,4 @@
+import { accountGate, mountAccount } from "./account-ui";
 import { mountAI } from "./ai-ui";
 import { brand, disclaimer } from "./brand";
 import { newCase, sampleCase } from "./cases";
@@ -9,28 +10,34 @@ import type { WCRow, GLRow, PremiumStep } from "./engine/types";
 import { workspaceSchema, type AuditCase, type Workspace } from "./schema";
 import { florida } from "./states/fl";
 
-const storageKey = "audit-monkey-workspace-v1";
+let storageKey = "audit-monkey-workspace-v1";
 let workspace: Workspace = { version: 1, cases: [sampleCase()] };
 let persist = false,
   firstRun = true,
   page = "overview",
   activeId = workspace.cases[0].id,
   message = "";
-try {
-  const raw = localStorage.getItem(storageKey);
-  if (raw) {
-    workspace = workspaceSchema.parse(JSON.parse(raw));
-    persist = true;
-    activeId = workspace.cases[0]?.id ?? "";
-  }
-  firstRun = localStorage.getItem("audit-monkey-notice") !== "accepted";
-} catch {
-  message =
-    "Saved workspace could not be read. Import a valid backup or start a new case.";
-}
-if (!workspace.cases.length) {
-  workspace.cases = [newCase()];
+function loadWorkspaceForAccount(userId: string) {
+  storageKey = "audit-monkey-workspace-v1:" + userId;
+  workspace = { version: 1, cases: [sampleCase()] };
   activeId = workspace.cases[0].id;
+  persist = false;
+  try {
+    const raw = localStorage.getItem(storageKey);
+    if (raw) {
+      workspace = workspaceSchema.parse(JSON.parse(raw));
+      persist = true;
+      activeId = workspace.cases[0]?.id ?? "";
+    }
+    firstRun = localStorage.getItem("audit-monkey-notice") !== "accepted";
+  } catch {
+    message =
+      "Saved workspace could not be read. Import a valid backup or start a new case.";
+  }
+  if (!workspace.cases.length) {
+    workspace.cases = [newCase()];
+    activeId = workspace.cases[0].id;
+  }
 }
 const root = document.querySelector<HTMLDivElement>("#app")!;
 const e = (v: unknown) =>
@@ -85,7 +92,7 @@ function overview(c: AuditCase) {
   const r = calculate(c),
     n = verified(c);
   return `
-  <section class="hero"><div><div class="eyebrow">A fair audit starts with good records</div><h1>Know what you owe.<br>Question what you don’t.</h1><p class="intro">Put your workers’ comp or general liability audit in order. Find missing records, follow the math and build a clear case for a correction.</p><div class="hero-actions"><button class="btn primary" data-page="prepare">Prepare my audit <span aria-hidden="true">↗</span></button><button class="btn" data-page="review">Review a final audit</button></div></div><aside class="hero-note"><div class="eyebrow">Your workspace, your records</div><div class="large">Private by design.</div><p>Documents are read in this browser. No uploads in local mode. Optional AI sends only text you choose to send. No tracking.</p><hr><div class="row"><span class="small">Florida first · WC & GL</span><span class="badge green">LOCAL ONLY</span></div></aside></section>
+  <section class="hero"><div><div class="eyebrow">A fair audit starts with good records</div><h1>Know what you owe.<br>Question what you don’t.</h1><p class="intro">Put your workers’ comp or general liability audit in order. Find missing records, follow the math and build a clear case for a correction.</p><div class="hero-actions"><button class="btn primary" data-page="prepare">Prepare my audit <span aria-hidden="true">↗</span></button><button class="btn" data-page="review">Review a final audit</button></div></div><aside class="hero-note"><div class="eyebrow">Your workspace, your records</div><div class="large">Private by design.</div><p>Audit calculations stay in this browser. Account details and files you explicitly upload go to Sourcy Inc. Optional AI sends only selected text.</p><hr><div class="row"><span class="small">Florida first · WC & GL</span><span class="badge green">EXPLICIT SHARING</span></div></aside></section>
   <div class="grid four"><div class="card stat"><span class="eyebrow">Documents verified</span><div class="value">${n}<span class="muted"> / ${c.evidence.length}</span></div><p>${c.evidence.length - n} items still need a decision</p></div><div class="card stat"><span class="eyebrow">Carrier final</span><div class="value">${c.policy.carrierFinal === null ? "—" : usd(c.policy.carrierFinal)}</div><p>Before deposit credit</p></div><div class="card stat"><span class="eyebrow">Proposed final</span><div class="value">${r.final === null ? "—" : usd(r.final)}</div><p>${r.complete ? "Scenario, subject to record review" : "Complete verified inputs to estimate"}</p></div><div class="card stat"><span class="eyebrow">Cases in workspace</span><div class="value">${workspace.cases.length.toString().padStart(2, "0")}</div><p>Switch clients without mixing records</p></div></div>
   <div class="section-heading"><h2>A clearer path through your audit</h2><span class="small muted">From the first request to the final answer</span></div><div class="grid"><article class="card pathcard"><div class="number">01 / PREPARE</div><h3>Get your records ready.</h3><p>A practical checklist, who to ask and why each record matters.</p><button data-page="prepare">Open checklist</button><span class="arrow" aria-hidden="true">↗</span></article><article class="card pathcard"><div class="number">02 / REVIEW</div><h3>Make the numbers add up.</h3><p>Check exposure, rates, adjustments and the balance line by line.</p><button data-page="review">Review the worksheet</button><span class="arrow" aria-hidden="true">↗</span></article><article class="card pathcard"><div class="number">03 / RESPOND</div><h3>Put your findings to work.</h3><p>Build an evidence index and a focused re-audit request.</p><button data-page="packet">Build a dispute packet</button><span class="arrow" aria-hidden="true">↗</span></article></div>
   <div class="grid two"><section class="card"><div class="row"><h3>Next up for ${e(c.name)}</h3><span class="badge">${c.line.toUpperCase()}</span></div><ol class="next-list">${
@@ -163,9 +170,10 @@ function render() {
     )
     .join(
       "",
-    )}</nav></div><div class="rail-bottom"><p><span class="privacy-dot"></span>Running on your device</p><p class="muted">Free for personal &<br>noncommercial use.</p><a href="${brand.help}" target="_blank" rel="noreferrer">Get paid help ↗</a></div></aside><div><header class="topbar"><div class="breadcrumbs">Workspace <span aria-hidden="true"> / </span><strong>${e(page === "overview" ? "Overview" : page === "cases" ? "Client cases" : c.name)}</strong></div><div class="tools"><span class="save-indicator">${persist ? "Saved in this browser" : "Session only · export to keep"}</span><button class="btn" data-action="export">Export JSON ↓</button><button class="btn dark" data-action="new-case">+ New case</button></div></header><main id="main" class="content" tabindex="-1"><div class="casebar"><div class="spread"><label class="sr-only" for="case-select">Active client case</label><select id="case-select">${workspace.cases.map((x) => `<option value="${e(x.id)}" ${x.id === activeId ? "selected" : ""}>${e(x.name)}</option>`).join("")}</select><span class="badge">FLORIDA</span>${c.fictional ? '<span class="badge amber">FICTIONAL DEMO · MADE-UP RATES</span>' : ""}</div><span class="small muted">${e(c.policy.start)} — ${e(c.policy.end)}</span></div><div id="status" role="status" class="status">${e(message)}</div>${page === "overview" ? overview(c) : page === "prepare" ? prepare(c) : page === "review" ? review(c) : page === "packet" ? packetView(c) : page === "cases" ? caseView() : sources() + '<div id="ai-settings"></div>'}<footer class="footer"><p>${e(disclaimer)} Free for personal and noncommercial use; commercial use needs permission. No affiliation with NCCI, ISO or AI providers is implied.</p><a href="${brand.help}" target="_blank" rel="noreferrer">Get paid help ↗</a></footer></main></div></div>${firstRun ? `<dialog id="first-run" aria-labelledby="notice-title"><img src="${brand.icon}" alt="The Audit Monkey"><div class="eyebrow">Before you begin</div><h2 id="notice-title">A clearer audit starts here.</h2><p>${e(disclaimer)}</p><p>Your files are processed locally. Cases stay in memory unless you enable browser storage. Export backups yourself. The demo uses fictional figures.</p><p>Code: PolyForm Noncommercial 1.0.0. Guides, prompts and templates: CC BY-NC 4.0. Commercial use needs permission.</p><button class="btn primary" data-action="accept">I understand · open workspace →</button></dialog>` : ""}`;
+    )}</nav></div><div class="rail-bottom"><p><span class="privacy-dot"></span>Local audit calculations</p><p class="muted">Free for personal &<br>noncommercial use.</p><a href="${brand.help}" target="_blank" rel="noreferrer">Get paid help ↗</a></div></aside><div><header class="topbar"><div class="breadcrumbs">Workspace <span aria-hidden="true"> / </span><strong>${e(page === "overview" ? "Overview" : page === "cases" ? "Client cases" : c.name)}</strong></div><div class="tools"><span class="save-indicator">${persist ? "Saved in this browser" : "Session only · export to keep"}</span><button class="btn" data-action="export">Export JSON ↓</button><button class="btn dark" data-action="new-case">+ New case</button></div></header><main id="main" class="content" tabindex="-1"><div class="casebar"><div class="spread"><label class="sr-only" for="case-select">Active client case</label><select id="case-select">${workspace.cases.map((x) => `<option value="${e(x.id)}" ${x.id === activeId ? "selected" : ""}>${e(x.name)}</option>`).join("")}</select><span class="badge">FLORIDA</span>${c.fictional ? '<span class="badge amber">FICTIONAL DEMO · MADE-UP RATES</span>' : ""}</div><span class="small muted">${e(c.policy.start)} — ${e(c.policy.end)}</span></div><div id="status" role="status" class="status">${e(message)}</div>${page === "overview" ? overview(c) : page === "prepare" ? prepare(c) : page === "review" ? review(c) : page === "packet" ? packetView(c) : page === "cases" ? caseView() + '<div id="account-controls"></div>' : sources() + '<div id="ai-settings"></div>'}<footer class="footer"><p>${e(disclaimer)} Free for personal and noncommercial use; commercial use needs permission. No affiliation with NCCI, ISO or AI providers is implied.</p><a href="${brand.help}" target="_blank" rel="noreferrer">Get paid help ↗</a></footer></main></div></div>${firstRun ? `<dialog id="first-run" aria-labelledby="notice-title"><img src="${brand.icon}" alt="The Audit Monkey"><div class="eyebrow">Before you begin</div><h2 id="notice-title">A clearer audit starts here.</h2><p>${e(disclaimer)}</p><p>Your files are processed locally. Cases stay in memory unless you enable browser storage. Export backups yourself. The demo uses fictional figures.</p><p>Code: PolyForm Noncommercial 1.0.0. Guides, prompts and templates: CC BY-NC 4.0. Commercial use needs permission.</p><button class="btn primary" data-action="accept">I understand · open workspace →</button></dialog>` : ""}`;
   bind();
   mountAI(root);
+  mountAccount(root);
   root
     .querySelectorAll<HTMLInputElement>("[data-evidence-file]")
     .forEach((input) => {
@@ -534,4 +542,8 @@ function action(id: string) {
   save();
   render();
 }
-render();
+void accountGate(root).then((userId) => {
+  loadWorkspaceForAccount(userId);
+  firstRun = false;
+  render();
+});

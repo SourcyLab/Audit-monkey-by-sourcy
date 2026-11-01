@@ -1,54 +1,13 @@
-# Verification evidence
+# Verification · account/backend revision
 
-Verified November 1, 2026, on Windows with Node 24.22.1 and Chrome 156.0.8078.48. All examples and screenshots use fictional data. These checks verify software behavior, not professional approval of insurance rules or provider certification.
+All test inputs and screenshots are fictional. Node 24 / local Cloudflare simulation; no real email sent, cloud resources provisioned, DNS modified or deployment performed.
 
-| Check | Result |
-| --- | --- |
-| One-command npm start (clean install + dev) | Passed: 226 packages installed; 227 audited; loopback server started |
-| Dependency audit against the final lockfile | 0 reported vulnerabilities at verification time |
-| ESLint + strict TypeScript | Passed |
-| Vitest engine and MCP protocol suite | **45 passed, 3 test files**; [verbose output](test-output.txt) |
-| Production static build | Passed with Vite 8.3.5; output `app/dist/` |
-| Production-preview browser workflow | Passed using loopback-only static preview |
-| Browser PDF extraction | Fictional PDF text extracted with the bundled worker; manual inputs remain separate |
-| Keyboard form flow | Tab focus retained after recalculation; previews/worksheet scroll regions keyboard focusable |
-| JSON export/import | Fictional workspace round-tripped; invalid version rejected |
-| Request/packet downloads | Draft Markdown files downloaded; nothing submitted |
-| Narrow screen | No document-level horizontal overflow at 390 × 844 for overview/review |
-| Automated accessibility | No axe WCAG 2.1 A/AA violations on 10 tested screens/states |
-| Runtime/network observation | No browser runtime errors; no external requests during the test workflow |
-| Git main scope before branch push | One initialization commit, only `README.md` |
+- Strict TypeScript and ESLint cover the browser, shared MCP and backend code; Wrangler generated the environment binding types.
+- Vitest: 54 tests across 5 files. Covers audit math, both modes/no-AI, provider adapters, registration, actual stdio/HTTP, local D1/R2 accounts, consent and upload isolation/deletion, code attempt/replay controls, OAuth DCR/discovery/PKCE/issuer/audience checks, browser-bound consent, token exchange, refresh rotation and revocation.
+- Browser: required contact/terms and code sign-in; optional consents initially unchecked; explicit upload authority; no-AI audit operations; PDF extraction; JSON round-trip; drafts; account-scoped saved workspace isolation; mobile layout and keyboard focus. No observed external requests or runtime errors in this local workflow. All tested axe WCAG 2.1 A/AA states have zero reported violations, not a certification of comprehensive conformance.
+- App build and Worker dry-run bundle both succeed locally. The local workerd supports compatibility date 2026-10-30; test simulation uses a supported date. No deploy command without --dry-run was used.
+- Updated dependency lockfile audit reports zero vulnerabilities at verification time.
 
-Detailed [browser results](browser-verification.json) and [screenshots](screenshots/) are committed. Automated accessibility checks and focused keyboard/visual inspection do **not** establish comprehensive WCAG conformance. Test actual assistive technologies and every supported browser before making a certification claim.
+[Verbose output](test-output.txt) · [Browser report](browser-verification.json) · [Backend setup and production gates](../backend/README.md).
 
-## Reproduce
-
-```sh
-npm ci
-npm run lint
-npm test -- --reporter=verbose
-npm run build
-npm run preview
-# Separate terminal, use the URL printed by preview:
-# AUDIT_BASE_URL=http://127.0.0.1:4173 npm run test:browser
-```
-
-PowerShell:
-
-```powershell
-$env:AUDIT_BASE_URL = 'http://127.0.0.1:4173'
-$env:AUDIT_BROWSER_PATH = 'C:\Program Files\Google\Chrome\Application\chrome.exe'
-npm run test:browser
-```
-
-Alternatively install Playwright Chromium as described in the README. Test output redacts only the local absolute repository path as `<repo>`; names, results and failures are otherwise retained. The HTTP transport tests bind an ephemeral loopback port and require local socket permission. CI runs them on Ubuntu/Node 24.
-
-## Important boundaries
-
-- No carrier rates, official officer payroll amounts, assessment percentages or universal dispute deadlines were invented. Synthetic inputs test formulas only. NCCI/ISO manual applicability still needs professional verification.
-- A clean test run does not independently verify an officer exemption, COI, correct class, GL exclusion or a provider account’s permissions.
-- Approved logos from commit 39f12ed replace legacy assets; see [provenance](../brand/README.md).
-- AI is optional BYOK and off by default. No hosted keys, provider approvals or listing are required under the revised user scope. MCP remains a separate local option. Live provider calls require a user key; adapter contracts are tested with mocked requests.
-- No deployment, provider marketplace submission, DNS change or modification to the separate paid-business repository is part of this build.
-
-Not legal, tax or insurance advice. No agent, CPA or client relationship is created. Verify with your carrier, NCCI and a licensed professional.
+The public-launch requirements and actual ChatGPT/Claude/Cursor/Gemini/Muse product acceptance are not established by tests. Local sign-in codes deliberately do not prove real email ownership; production requires configured verified email delivery. Phone ownership is not verified. No AI training, third-party sale or transfer has been performed. Terms/privacy wording needs legal review before production, particularly for employees' and subcontractors' data.
