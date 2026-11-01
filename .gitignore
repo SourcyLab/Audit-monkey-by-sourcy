@@ -1,0 +1,10 @@
+node_modules/
+app/dist/
+coverage/
+*.local
+.env*
+!*.example
+test-results/
+app/public/brand/
+.lock-stage/
+pnpm-lock.yaml

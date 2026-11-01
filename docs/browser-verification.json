@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-01T21:11:53.580Z",
+  "browser": "156.0.8078.48",
+  "checks": [
+    "first-run",
+    "local PDF extraction",
+    "WC calculation edit",
+    "Tab focus retained",
+    "GL basis",
+    "18-item checklist",
+    "request download",
+    "packet download",
+    "JSON export/import",
+    "invalid import",
+    "new case incomplete",
+    "mobile overflow"
+  ],
+  "externalRequests": [],
+  "runtimeErrors": [],
+  "accessibility": [
+    {
+      "page": "first-run",
+      "violations": []
+    },
+    {
+      "page": "overview",
+      "violations": []
+    },
+    {
+      "page": "prepare",
+      "violations": []
+    },
+    {
+      "page": "review",
+      "violations": []
+    },
+    {
+      "page": "gl-review",
+      "violations": []
+    },
+    {
+      "page": "packet",
+      "violations": []
+    },
+    {
+      "page": "cases",
+      "violations": []
+    },
+    {
+      "page": "sources",
+      "violations": []
+    },
+    {
+      "page": "mobile-overview",
+      "violations": []
+    },
+    {
+      "page": "mobile-review",
+      "violations": []
+    }
+  ]
+}

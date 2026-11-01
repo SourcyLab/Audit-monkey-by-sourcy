@@ -1,0 +1,42 @@
+{
+  "name": "audit-monkey-by-sourcy",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite app --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build app",
+    "preview": "vite preview app --host 127.0.0.1",
+    "lint": "eslint app/src mcp && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "predev": "node scripts/sync-brand.mjs",
+    "prebuild": "node scripts/sync-brand.mjs",
+    "mcp:stdio": "tsx mcp/server.ts",
+    "mcp:http": "tsx mcp/server.ts --http",
+    "test:browser": "node scripts/browser-check.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.6",
+    "eslint": "^10.14.0",
+    "playwright": "^1.64.1",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "pdfjs-dist": "^6.4.299",
+    "zod": "^4.1.12"
+  },
+  "overrides": {
+    "minimatch": "^11.0.1"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  }
+}

@@ -1,0 +1,3 @@
+[mcp_servers.audit-monkey]
+command = "node"
+args = ["ABSOLUTE_REPO_PATH/node_modules/tsx/dist/cli.mjs", "ABSOLUTE_REPO_PATH/mcp/server.ts"]

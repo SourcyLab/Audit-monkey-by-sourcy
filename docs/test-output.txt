@@ -1,0 +1,46 @@
+
+ RUN  v5.0.5 <repo>
+
+ ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > allocates payroll by class and rate per $100 5ms
+ ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > removes only the premium portion of overtime 0ms
+ ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > applies verified officer maximum and minimum for the entered period 0ms
+ ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > withholds final when officer limits are missing 0ms
+ ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > reverses uninsured-sub charge only after explicit verification 0ms
+ ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > does not treat unverified exemption as zero exposure 0ms
+ ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > applies dated experience mod to the correct rows 0ms
+ ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > requires actual exposure split at a mod change instead of guessing payroll 0ms
+ ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > rejects ambiguous overlapping mod schedules 0ms
+ ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > detects partial overlapping mod periods hidden inside a row 0ms
+ ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > withholds duplicate officer limits across overlapping class rows 0ms
+ ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > withholds unknown rates and unsupported allocation 0ms
+ ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > rejects exclusions greater than payroll and out-of-period rows 0ms
+ ✓ app/src/engine/engine.test.ts > general liability bases > calculates sales basis with its explicit denominator 0ms
+ ✓ app/src/engine/engine.test.ts > general liability bases > calculates payroll basis with its explicit denominator 0ms
+ ✓ app/src/engine/engine.test.ts > general liability bases > calculates units basis with its explicit denominator 0ms
+ ✓ app/src/engine/engine.test.ts > general liability bases > retains insured sub cost unless policy authority is explicitly verified 0ms
+ ✓ app/src/engine/engine.test.ts > general liability bases > does not remove insured-sub amount from a sales basis 0ms
+ ✓ app/src/engine/engine.test.ts > general liability bases > rejects impossible exposure and zero denominator 0ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > orders credit, minimum, expense constant and assessment 0ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > prorates only the selected annual fixed charge and never actual exposure 0ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > returns positive balance due or negative return after deposit 0ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > rejects invalid calendar dates and zero or reversed duration 0ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > withholds an unverified premium sequence 0ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > rounds final cents, not every intermediate operation 0ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > quantifies OT independently, keeps total scenario comparison separate 0ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > shows minimum premium can erase an exposure saving 0ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > rejects malformed imports, huge values and negative amounts 6ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > starts real cases with unknown values and produces clearly incomplete drafts 1ms
+ ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > initializes and discovers eight typed tools with safe annotations 18ms
+ ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > calls WC and GL through MCP with structured calculation results 5ms
+ ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > rejects invalid inputs rather than silently converting them 1ms
+ ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > returns checklist and source rules with disclaimers 2ms
+ ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > searches and fetches public guides without arbitrary file access 3ms
+ ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > publishes resources and a preparation prompt 4ms
+ ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > reviews supplied case data and returns a draft without submitting it 2ms
+ ✓ mcp/server.test.ts > real MCP transports > negotiates over an actual stdio subprocess with clean stdout 417ms
+ ✓ mcp/server.test.ts > real MCP transports > negotiates local Streamable HTTP and blocks hostile origins and hosts 57ms
+
+ Test Files  2 passed (2)
+      Tests  38 passed (38)
+   Start at  16:11:54
+   Duration  925ms (tests 58%, import 37%, transform 4%, worker 1%)
