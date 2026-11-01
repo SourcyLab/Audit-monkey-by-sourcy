@@ -29,7 +29,8 @@
  ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > quantifies OT independently, keeps total scenario comparison separate 0ms
  ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > shows minimum premium can erase an exposure saving 0ms
  ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > rejects malformed imports, huge values and negative amounts 6ms
- ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > starts real cases with unknown values and produces clearly incomplete drafts 1ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > starts real cases with unknown values and produces clearly incomplete drafts 0ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > distinguishes standalone impacts and avoids claiming records are attached 0ms
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > initializes and discovers eight typed tools with safe annotations 18ms
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > calls WC and GL through MCP with structured calculation results 5ms
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > rejects invalid inputs rather than silently converting them 1ms
@@ -37,10 +38,10 @@
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > searches and fetches public guides without arbitrary file access 3ms
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > publishes resources and a preparation prompt 4ms
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > reviews supplied case data and returns a draft without submitting it 2ms
- ✓ mcp/server.test.ts > real MCP transports > negotiates over an actual stdio subprocess with clean stdout 417ms
+ ✓ mcp/server.test.ts > real MCP transports > negotiates over an actual stdio subprocess with clean stdout 463ms
  ✓ mcp/server.test.ts > real MCP transports > negotiates local Streamable HTTP and blocks hostile origins and hosts 57ms
 
  Test Files  2 passed (2)
-      Tests  38 passed (38)
-   Start at  16:11:54
-   Duration  925ms (tests 58%, import 37%, transform 4%, worker 1%)
+      Tests  39 passed (39)
+   Start at  16:16:41
+   Duration  982ms (tests 56%, import 36%, transform 7%, worker 1%)

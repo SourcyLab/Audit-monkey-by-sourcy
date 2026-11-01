@@ -278,4 +278,12 @@ describe("premium sequence, dates and balances", () => {
     expect(packet(c, "DISCLAIMER")).toContain("TODO — incomplete");
     expect(packet(c, "DISCLAIMER")).toContain("Nothing has been submitted.");
   });
+  it("distinguishes standalone impacts and avoids claiming records are attached", () => {
+    const draft = packet(fixture(), "DISCLAIMER");
+    expect(draft).toContain("Overall carrier-versus-proposed difference: 2160");
+    expect(draft).toContain("Standalone adjustment effect (not additive): 180");
+    expect(draft).not.toContain("Estimated overall difference:");
+    expect(draft).toContain("Only records explicitly marked as attached");
+    expect(draft).not.toContain("the attached records");
+  });
 });

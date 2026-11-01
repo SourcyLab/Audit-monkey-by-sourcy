@@ -7,7 +7,7 @@ Verified November 1, 2026, on Windows with Node 24.22.1 and Chrome 156.0.8078.48
 | Clean npm lockfile install in an isolated staging directory | Passed: 226 packages installed; 227 audited |
 | Dependency audit against the final lockfile | 0 reported vulnerabilities at verification time |
 | ESLint + strict TypeScript | Passed |
-| Vitest engine and MCP protocol suite | **38 passed, 2 test files**; [verbose output](test-output.txt) |
+| Vitest engine and MCP protocol suite | **39 passed, 2 test files**; [verbose output](test-output.txt) |
 | Production static build | Passed with Vite 8.3.5; output `app/dist/` |
 | Production-preview browser workflow | Passed using loopback-only static preview |
 | Browser PDF extraction | Fictional PDF text extracted with the bundled worker; manual inputs remain separate |
