@@ -1,4 +1,8 @@
-# The Audit Monkey, by Sourcy
+# The Audit Monkey
+
+![Code: PolyForm Noncommercial](https://img.shields.io/badge/code-PolyForm_Noncommercial_1.0.0-blue) ![Docs: CC BY-NC 4.0](https://img.shields.io/badge/docs-CC_BY--NC_4.0-blue)
+
+![The Audit Monkey](brand/audit-monkey-wordmark-light.svg)
 
 A free tool for preparing, reviewing and questioning workers’ compensation and general liability premium audits. Florida first, with a separate NCCI state module and a separate GL engine. Built for an insured’s audit preparation and staff case review, subject to the noncommercial licensing terms below.
 
@@ -36,13 +40,14 @@ The compiled static app is in `app/dist/`. These commands do not deploy anything
 
 ## Screenshots
 
-All screenshots use fictional data. The visual brand currently uses the logo retrieved from the brand website; the refreshed assets supplied through an unavailable `/workspace/...` mount remain pending. See [brand provenance](brand/README.md).
+All screenshots use fictional data and the approved assets from commit 39f12ed. See [brand provenance](brand/README.md).
 
 ![Desktop audit workspace](docs/screenshots/overview-desktop.png)
 
 <details>
 <summary>Mobile workspace and editable review</summary>
 
+![Before-audit preparation](docs/screenshots/prepare-desktop.png)
 ![Mobile audit workspace](docs/screenshots/overview-mobile.png)
 ![Editable audit review](docs/screenshots/review-desktop.png)
 
@@ -50,11 +55,11 @@ All screenshots use fictional data. The visual brand currently uses the logo ret
 
 ## Privacy and limitations
 
-The **web app** has no backend, accounts, API keys, analytics, remote fonts or external data services. PDF text extraction uses a locally bundled worker. Documents and case data are not uploaded. External source/help/credit links open only when you choose them and do not include case data.
+With AI off, the **web app** has no backend, accounts, API keys, analytics, remote fonts or external data services. PDF text extraction uses a locally bundled worker. Documents and case data are not uploaded. External source/help/credit links open only when you choose them and do not include case data.
 
 Cases remain in memory until you export JSON or enable **Remember cases on this browser**. Browser storage and exported files are unencrypted. Turning browser storage off removes that saved workspace; exported copies remain wherever you put them. The first-run acknowledgment is a separate small local preference. On a shared device, keep browser storage off and handle exports securely. No secrets or real customer data belong in this repository.
 
-The **MCP process** is separate from the web app. It does not read browser cases, persist data or make outbound calls. A connected AI client sees supplied inputs and outputs and may send them to its provider. Read its privacy terms before sharing data. Stdio and a loopback-only Streamable HTTP development transport are implemented and tested. **No provider approval, public directory listing, remote deployment or consumer-chat integration is claimed.** ChatGPT public review requires a real hosted endpoint and other account/review requirements; Meta’s connector route has preview-program requirements. These remain outside this no-deployment task.
+The **MCP process** is separate from the web app. It does not read browser cases, persist data or make outbound calls. A connected AI client sees supplied inputs and outputs and may send them to its provider. Read its privacy terms before sharing data. Stdio and a loopback-only Streamable HTTP development transport are implemented and tested. **No provider approval, public directory listing, remote deployment or consumer-chat integration is claimed.** ChatGPT public review requires a real hosted endpoint and other account/review requirements; Meta’s connector route has preview-program requirements. These are optional future publication steps, not blockers or requirements for this BYOK release.
 
 PDF extraction reads text, not visual meaning. It does not infer class codes or automatically populate financial inputs. Scanned PDFs require separately performed OCR or manual entry. Limits: 25 MB / 200 PDF pages, 200,000 extracted characters, 5 MB JSON imports, 100 cases per imported workspace. Files that fail validation are rejected. The tool does not classify a business or decide insurance coverage.
 
@@ -100,4 +105,10 @@ For an installed browser, set `AUDIT_BROWSER_PATH` to its executable. Set `AUDIT
 
 **Not legal, tax or insurance advice. No agent, CPA or client relationship is created. Verify with your carrier, NCCI and a licensed professional.**
 
-[by Sourcy](https://sourcyinc.com) · [Need help? The Audit Monkey](https://theauditmonkey.com)
+[by Sourcy](https://sourcyinc.com) · [Get paid help](https://theauditmonkey.com)
+
+## Optional AI settings
+
+AI is off by default. Under Sources & guides, enable it for this session, select OpenAI-compatible or Anthropic, enter your own endpoint, model ID and key, and review the exact selected text before pressing Send. Keys/settings stay only in memory: no hosted keys, saved keys, .env bundling or inclusion in JSON exports. Reload or Clear disables AI. Provider requests can cost money and send text to that provider. CORS/network/provider errors do not affect either local audit mode. No provider approvals or deployment are required for this release. MCP remains an optional local integration.
+
+Documentation under docs/, guides/, prompts/ and templates is CC BY-NC 4.0; see docs/LICENSE and guides/LICENSE. The original code remains PolyForm Noncommercial 1.0.0.

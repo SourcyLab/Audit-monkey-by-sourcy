@@ -1,6 +1,12 @@
 
  RUN  v5.0.5 <repo>
 
+ ✓ app/src/ai.test.ts > runs before-audit missing item guidance with no AI 5ms
+ ✓ app/src/ai.test.ts > runs after-audit findings and dispute output with no AI 2ms
+ ✓ app/src/ai.test.ts > never sends a request while disabled, even with a key 1ms
+ ✓ app/src/ai.test.ts > uses a caller key with openai-compatible only after opt-in 15ms
+ ✓ app/src/ai.test.ts > uses a caller key with anthropic only after opt-in 2ms
+ ✓ app/src/ai.test.ts > handles provider failure without changing the local engine 1ms
  ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > allocates payroll by class and rate per $100 5ms
  ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > removes only the premium portion of overtime 0ms
  ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > applies verified officer maximum and minimum for the entered period 0ms
@@ -38,10 +44,10 @@
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > searches and fetches public guides without arbitrary file access 3ms
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > publishes resources and a preparation prompt 4ms
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > reviews supplied case data and returns a draft without submitting it 2ms
- ✓ mcp/server.test.ts > real MCP transports > negotiates over an actual stdio subprocess with clean stdout 463ms
- ✓ mcp/server.test.ts > real MCP transports > negotiates local Streamable HTTP and blocks hostile origins and hosts 57ms
+ ✓ mcp/server.test.ts > real MCP transports > negotiates over an actual stdio subprocess with clean stdout 428ms
+ ✓ mcp/server.test.ts > real MCP transports > negotiates local Streamable HTTP and blocks hostile origins and hosts 62ms
 
- Test Files  2 passed (2)
-      Tests  39 passed (39)
-   Start at  16:16:41
-   Duration  982ms (tests 56%, import 36%, transform 7%, worker 1%)
+ Test Files  3 passed (3)
+      Tests  45 passed (45)
+   Start at  16:53:21
+   Duration  1.04s (tests 45%, import 42%, transform 12%, worker 1%)

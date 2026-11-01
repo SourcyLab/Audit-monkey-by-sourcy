@@ -1,8 +1,10 @@
 {
-  "date": "2026-11-01T21:11:53.580Z",
+  "date": "2026-11-01T21:51:29.719Z",
   "browser": "156.0.8078.48",
   "checks": [
     "first-run",
+    "before-audit local record intake",
+    "AI off by default and no request on disabled Send",
     "local PDF extraction",
     "WC calculation edit",
     "Tab focus retained",

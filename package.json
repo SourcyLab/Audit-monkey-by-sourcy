@@ -14,7 +14,8 @@
     "prebuild": "node scripts/sync-brand.mjs",
     "mcp:stdio": "tsx mcp/server.ts",
     "mcp:http": "tsx mcp/server.ts --http",
-    "test:browser": "node scripts/browser-check.mjs"
+    "test:browser": "node scripts/browser-check.mjs",
+    "start": "npm ci && npm run dev"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

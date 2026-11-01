@@ -1,7 +1,9 @@
 export const brand = {
   name: "The Audit Monkey",
-  logo: "/brand/logo.png",
-  favicon: "/brand/favicon.ico",
+  logo: "/brand/audit-monkey-wordmark-light.svg",
+  icon: "/brand/audit-monkey-icon.svg",
+  ogImage: "/brand/audit-monkey-wordmark-light.png",
+  favicon: "/brand/audit-monkey-32.png",
   credit: "https://sourcyinc.com",
   help: "https://theauditmonkey.com",
 } as const;

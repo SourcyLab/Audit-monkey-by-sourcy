@@ -1,6 +1,6 @@
 # Third-party rights and references
 
-The project’s original code is PolyForm Noncommercial 1.0.0. Dependencies retain their own licenses. Installing dependencies does not relicense them under PolyForm.
+The project’s original code is PolyForm Noncommercial 1.0.0. Original documentation in docs/, guides/, prompts/ and templates is CC BY-NC 4.0. Dependencies retain their own licenses. Installing dependencies does not relicense them under PolyForm.
 
 Principal runtime dependencies:
 

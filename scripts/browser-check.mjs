@@ -76,6 +76,25 @@ try {
   await page.getByRole("button", { name: "Prepare my audit" }).click();
   await axe("prepare");
   assert.equal(await page.locator(".check-card").count(), 18);
+  await page
+    .locator('[data-evidence-file="0"]')
+    .setInputFiles({
+      name: "fictional-policy.txt",
+      mimeType: "text/plain",
+      buffer: Buffer.from("Fictional record"),
+    });
+  assert.match(
+    await page.locator('[data-path="evidence.0.note"]').inputValue(),
+    /fictional-policy.txt/,
+  );
+  assert.equal(
+    await page.locator('[data-path="evidence.0.status"]').inputValue(),
+    "received",
+  );
+  await page.screenshot({
+    path: "docs/screenshots/prepare-desktop.png",
+    fullPage: true,
+  });
   const letterWait = page.waitForEvent("download");
   await page
     .getByRole("button", { name: "Carrier request letter", exact: true })
@@ -107,13 +126,11 @@ try {
     .slice(1)
     .map((n) => String(n).padStart(10, "0") + " 00000 n \n")
     .join("")}trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
-  await page
-    .locator("#pdf-upload")
-    .setInputFiles({
-      name: "fictional-worksheet.pdf",
-      mimeType: "application/pdf",
-      buffer: Buffer.from(pdf),
-    });
+  await page.locator("#pdf-upload").setInputFiles({
+    name: "fictional-worksheet.pdf",
+    mimeType: "application/pdf",
+    buffer: Buffer.from(pdf),
+  });
   await page
     .getByRole("status")
     .filter({ hasText: "PDF text is ready" })
@@ -170,24 +187,20 @@ try {
   const exported = JSON.parse(Buffer.concat(parts).toString());
   assert.equal(exported.version, 1);
   assert.equal(exported.cases.length, 1);
-  await page
-    .locator("#json-import")
-    .setInputFiles({
-      name: "fixture.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(JSON.stringify(exported)),
-    });
+  await page.locator("#json-import").setInputFiles({
+    name: "fixture.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(exported)),
+  });
   await page
     .getByRole("status")
     .filter({ hasText: "Workspace imported" })
     .waitFor();
-  await page
-    .locator("#json-import")
-    .setInputFiles({
-      name: "bad.json",
-      mimeType: "application/json",
-      buffer: Buffer.from('{"version":99}'),
-    });
+  await page.locator("#json-import").setInputFiles({
+    name: "bad.json",
+    mimeType: "application/json",
+    buffer: Buffer.from('{"version":99}'),
+  });
   await page
     .getByRole("status")
     .filter({ hasText: "Import rejected" })
@@ -204,6 +217,9 @@ try {
     .getByRole("button", { name: "Sources & guides", exact: true })
     .click();
   await axe("sources");
+  assert.equal(await page.locator("#ai-enabled").isChecked(), false);
+  await page.locator("#ai-send").click();
+  assert.match(await page.locator("#ai-status").innerText(), /AI is off/);
   await page.getByRole("button", { name: "Overview", exact: true }).click();
   await page.locator("#case-select").selectOption(exported.cases[0].id);
   await page.setViewportSize({ width: 390, height: 844 });
@@ -241,6 +257,8 @@ try {
     browser: browser.version(),
     checks: [
       "first-run",
+      "before-audit local record intake",
+      "AI off by default and no request on disabled Send",
       "local PDF extraction",
       "WC calculation edit",
       "Tab focus retained",
