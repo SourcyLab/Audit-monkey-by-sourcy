@@ -7,7 +7,7 @@
     "dev": "vite app --host 127.0.0.1",
     "build": "tsc --noEmit && vite build app",
     "preview": "vite preview app --host 127.0.0.1",
-    "lint": "eslint app/src mcp backend/*.ts tests && tsc --noEmit && tsc --noEmit -p backend/tsconfig.json",
+    "lint": "eslint app/src mcp backend/*.ts scripts/benchmark.ts tests && tsc --noEmit && tsc --noEmit -p backend/tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "predev": "node scripts/sync-brand.mjs && node scripts/sync-guides.mjs",
@@ -20,7 +20,8 @@
     "build:api": "node scripts/build-backend.mjs",
     "pretest": "npm run build && npm run build:api",
     "test:pilot-browser": "node scripts/pilot-browser-check.mjs",
-    "verify:browser": "node scripts/verify-browser.mjs"
+    "verify:browser": "node scripts/verify-browser.mjs",
+    "benchmark": "tsx scripts/benchmark.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

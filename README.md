@@ -20,6 +20,10 @@ Open **http://localhost:8787**. This performs npm ci, builds the static app, cre
 
 Enter a fictional email, phone and accept the current terms. In local development only, the sign-in code is displayed in the browser; no email is sent. Development mode refuses public hostnames. Use fictional records only. The first audit case is a fictional demo with made-up rates/classes. New case starts your own worksheet. See [backend setup and limits](backend/README.md).
 
+## Start a private real-client benchmark
+
+A separate **offline structured benchmark** can compare redacted WC/GL figures against independently human-verified references without starting the development-login web app or uploading records. Run `npm run benchmark -- --init <private-file.json>`, then `npm run benchmark -- --input <private-file.json> --out <private-output-folder>`. Inputs and outputs must stay outside this public checkout. The generated template is synthetic; real accuracy has not been established. Reports separate real/synthetic cohorts, compare premium/balance and candidate-adjustment categories, and record staff timing and unassessed review. No AI, training, sale or carrier submission occurs. See the [real-client benchmark procedure](docs/real-client-benchmark.md). Identifiable uploads/live employee collaboration still require the hosted-pilot safeguards.
+
 ## Accounts, terms and privacy
 
 The browser workspace now requires email, phone, current-terms acceptance and a sign-in code. The old disclaimer acknowledgment cannot bypass registration. In production, a configured email service must verify email ownership; phone ownership is not verified. Operator: **Sourcy Inc**. Privacy, withdrawal and deletion contact: **Team@sourcyinc.com**.

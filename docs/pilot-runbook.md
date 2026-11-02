@@ -2,6 +2,8 @@
 
 This build is a local, fictional-data pilot. It is not deployed. Do not put live client records into development-code login mode. A hosted employee pilot requires explicit deployment authorization, HTTPS, real email verification and the operational checks below.
 
+For a first comparison using redacted real-client figures and independent references, use the separate [offline benchmark procedure](real-client-benchmark.md). It does not start the web app or use development login codes. No real cases have been benchmarked by the repository tests.
+
 ## Run and sign in
 
 Install Node 24 with npm, then run `npm start` from the repository root. Open http://localhost:8787. Sign up with a fictional email, phone and current terms; the local-only email code appears on screen. Optional training and sale permissions are separate and unchecked. No email is sent in local mode.

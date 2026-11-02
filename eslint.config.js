@@ -7,6 +7,7 @@ export default ts.config(js.configs.recommended, ...ts.configs.recommended, {
     "backend/worker.ts",
     "backend/mcp.ts",
     "tests/**/*.ts",
+    "scripts/benchmark.ts",
   ],
   languageOptions: {
     globals: {

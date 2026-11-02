@@ -1,0 +1,8 @@
+{
+  "date": "2026-11-02T03:00:12.355Z",
+  "realCases": 0,
+  "syntheticControls": 2,
+  "externalRequests": [],
+  "axeViolations": 0,
+  "note": "Synthetic controls only. No real-client accuracy claim."
+}
