@@ -1,0 +1,22 @@
+{
+  "date": "2026-11-02T03:59:14.164Z",
+  "checks": [
+    "source-quoted structured draft with synthetic mocked model",
+    "all verification cleared on import",
+    "staff correction recorded against original immutable draft",
+    "unapproved lesson excluded from retrieval",
+    "source-checked owner approval",
+    "next synthetic audit receives the approved correction in its model context",
+    "model key absent from saved review snapshot",
+    "source-case/account cleanup"
+  ],
+  "modelCalls": 2,
+  "rememberedLessonsPerCall": [
+    0,
+    1
+  ],
+  "runtimeErrors": [],
+  "externalRequests": [],
+  "axeViolations": 0,
+  "limits": "Synthetic mock verifies wiring only; no real provider call, real-client learning or performance improvement is established."
+}

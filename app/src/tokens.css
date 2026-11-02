@@ -1,0 +1,41 @@
+/* Source: theauditmonkey.com/assets/index-3Me6JpQ8.css, retrieved 2026-11-01.
+   Original brand colors retained; accessible text variants added. */
+:root {
+  --blue: #1e6fff;
+  --blue-dark: #1558d6;
+  --blue-light: #5b9bff;
+  --navy: #0a1628;
+  --sky: #e8f1ff;
+  --white: #fff;
+  --canvas: #f4f7ff;
+  --ink: #14243b;
+  --muted: #52637a;
+  --line: #d8e1ee;
+  --soft: #f7f9fc;
+  --green: #14664c;
+  --green-bg: #e7f5ee;
+  --amber: #82520a;
+  --amber-bg: #fff4da;
+  --red: #a72d2d;
+  --shadow: 0 14px 40px #0a162809;
+  --radius: 18px;
+}
+
+:root {
+  --white-faint: #ffffff18;
+}
+:root {
+  --white-line: #ffffff26;
+}
+:root {
+  --hero-eyebrow: #afc9fb;
+}
+:root {
+  --hero-muted: #c2cfe0;
+}
+:root {
+  --dialog-shadow: #0a162840;
+}
+:root {
+  --backdrop: #0a162899;
+}

@@ -1,0 +1,70 @@
+{
+  "date": "2026-11-02T03:59:03.196Z",
+  "browser": "156.0.8078.48",
+  "checks": [
+    "required email/phone/current terms and local email-code flow",
+    "training and sale consent not preselected",
+    "explicit private upload after authority confirmation",
+    "before-audit local record intake",
+    "AI off by default and no request on disabled Send",
+    "local PDF extraction",
+    "WC calculation edit",
+    "Tab focus retained",
+    "GL basis",
+    "18-item checklist",
+    "request download",
+    "packet and printable HTML report download",
+    "tenant case save, explicit teammate grant and browser-reload recovery",
+    "JSON export/import",
+    "invalid import",
+    "new case incomplete",
+    "ready stage blocked until submission checks resolve",
+    "WC CSV template download/import requires fresh verification",
+    "mobile overflow",
+    "account-scoped browser storage prevents case inheritance"
+  ],
+  "externalRequests": [],
+  "runtimeErrors": [],
+  "accessibility": [
+    {
+      "page": "signup-contact-and-terms",
+      "violations": []
+    },
+    {
+      "page": "overview",
+      "violations": []
+    },
+    {
+      "page": "prepare",
+      "violations": []
+    },
+    {
+      "page": "review",
+      "violations": []
+    },
+    {
+      "page": "gl-review",
+      "violations": []
+    },
+    {
+      "page": "packet",
+      "violations": []
+    },
+    {
+      "page": "cases",
+      "violations": []
+    },
+    {
+      "page": "sources",
+      "violations": []
+    },
+    {
+      "page": "mobile-overview",
+      "violations": []
+    },
+    {
+      "page": "mobile-review",
+      "violations": []
+    }
+  ]
+}
