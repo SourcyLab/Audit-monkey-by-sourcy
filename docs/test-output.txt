@@ -1,13 +1,24 @@
 
  RUN  v5.0.5 <repo>
 
- ✓ app/src/ai.test.ts > runs before-audit missing item guidance with no AI 7ms
- ✓ app/src/ai.test.ts > runs after-audit findings and dispute output with no AI 3ms
- ✓ app/src/ai.test.ts > never sends a request while disabled, even with a key 2ms
- ✓ app/src/ai.test.ts > uses a caller key with openai-compatible only after opt-in 23ms
- ✓ app/src/ai.test.ts > uses a caller key with anthropic only after opt-in 3ms
- ✓ app/src/ai.test.ts > handles provider failure without changing the local engine 1ms
- ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > allocates payroll by class and rate per $100 7ms
+ ✓ app/src/workflow.test.ts > migrates original case JSON without losing payroll and never treats it as staff approved 18ms
+ ✓ app/src/workflow.test.ts > requires evidence references, policy identity, calculation and review before submission readiness 1ms
+ ✓ app/src/workflow.test.ts > produces an escaped printable draft with policy identity and excludes private staff notes 2ms
+ ✓ app/src/workflow.test.ts > identifies follow-up due dates without inventing carrier deadlines 0ms
+ ✓ app/src/benchmark.test.ts > compares final premium and balance to an independent hand calculation, while keeping synthetic controls separate 16ms
+ ✓ app/src/benchmark.test.ts > scores GL sales and a return premium and supports a real-cohort reference only after independent verification 4ms
+ ✓ app/src/benchmark.test.ts > flags dollar mismatches and missed/extra categories without averaging withheld outputs as zero error 2ms
+ ✓ app/src/benchmark.test.ts > respects declared cent tolerance and never treats unknown flags or time as measured 4ms
+ ✓ app/src/benchmark.test.ts > distinguishes expected abstention from an unexpected final and keeps critical manual errors visible 4ms
+ ✓ app/src/benchmark.test.ts > rejects identities, narrative text, duplicate IDs, invalid reference states and mixed coverage rows 3ms
+ ✓ app/src/benchmark.test.ts > renders a self-contained private HTML report with no active content or external resources 1ms
+ ✓ app/src/csv.test.ts > imports quoted WC names and preserves amounts while requiring new verification 13ms
+ ✓ app/src/csv.test.ts > imports GL basis without copying WC verification or accepting blank zero by accident 3ms
+ ✓ app/src/csv.test.ts > rejects malformed, oversized and duplicate-header CSV without changing the case 2ms
+ ✓ app/src/registration.test.ts > requires email, phone and an affirmative current-terms decision 7ms
+ ✓ app/src/registration.test.ts > does not treat the old disclaimer acknowledgment as registration or consent 1ms
+ ✓ app/src/registration.test.ts > does not infer training or sale permission from accepting general terms 0ms
+ ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > allocates payroll by class and rate per $100 8ms
  ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > removes only the premium portion of overtime 0ms
  ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > applies verified officer maximum and minimum for the entered period 0ms
  ✓ app/src/engine/engine.test.ts > workers’ compensation math (all amounts fictional) > withholds final when officer limits are missing 0ms
@@ -32,58 +43,55 @@
  ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > rejects invalid calendar dates and zero or reversed duration 0ms
  ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > withholds an unverified premium sequence 0ms
  ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > rounds final cents, not every intermediate operation 0ms
- ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > quantifies OT independently, keeps total scenario comparison separate 1ms
- ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > shows minimum premium can erase an exposure saving 0ms
- ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > rejects malformed imports, huge values and negative amounts 11ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > quantifies OT independently, keeps total scenario comparison separate 2ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > shows minimum premium can erase an exposure saving 1ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > rejects malformed imports, huge values and negative amounts 7ms
  ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > starts real cases with unknown values and produces clearly incomplete drafts 1ms
- ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > distinguishes standalone impacts and avoids claiming records are attached 1ms
- ✓ app/src/csv.test.ts > imports quoted WC names and preserves amounts while requiring new verification 13ms
- ✓ app/src/csv.test.ts > imports GL basis without copying WC verification or accepting blank zero by accident 3ms
- ✓ app/src/csv.test.ts > rejects malformed, oversized and duplicate-header CSV without changing the case 2ms
- ✓ app/src/registration.test.ts > requires email, phone and an affirmative current-terms decision 5ms
- ✓ app/src/registration.test.ts > does not treat the old disclaimer acknowledgment as registration or consent 0ms
- ✓ app/src/registration.test.ts > does not infer training or sale permission from accepting general terms 0ms
- ✓ app/src/benchmark.test.ts > compares final premium and balance to an independent hand calculation, while keeping synthetic controls separate 18ms
- ✓ app/src/benchmark.test.ts > scores GL sales and a return premium and supports a real-cohort reference only after independent verification 5ms
- ✓ app/src/benchmark.test.ts > flags dollar mismatches and missed/extra categories without averaging withheld outputs as zero error 2ms
- ✓ app/src/benchmark.test.ts > respects declared cent tolerance and never treats unknown flags or time as measured 3ms
- ✓ app/src/benchmark.test.ts > distinguishes expected abstention from an unexpected final and keeps critical manual errors visible 3ms
- ✓ app/src/benchmark.test.ts > rejects identities, narrative text, duplicate IDs, invalid reference states and mixed coverage rows 3ms
- ✓ app/src/benchmark.test.ts > renders a self-contained private HTML report with no active content or external resources 1ms
- ✓ app/src/workflow.test.ts > migrates original case JSON without losing payroll and never treats it as staff approved 12ms
- ✓ app/src/workflow.test.ts > requires evidence references, policy identity, calculation and review before submission readiness 1ms
- ✓ app/src/workflow.test.ts > produces an escaped printable draft with policy identity and excludes private staff notes 1ms
- ✓ app/src/workflow.test.ts > identifies follow-up due dates without inventing carrier deadlines 0ms
- ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > initializes and discovers eight typed tools with safe annotations 20ms
- ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > calls WC and GL through MCP with structured calculation results 5ms
+ ✓ app/src/engine/engine.test.ts > premium sequence, dates and balances > distinguishes standalone impacts and avoids claiming records are attached 0ms
+ ✓ app/src/ai.test.ts > runs before-audit missing item guidance with no AI 7ms
+ ✓ app/src/ai.test.ts > runs after-audit findings and dispute output with no AI 3ms
+ ✓ app/src/ai.test.ts > never sends a request while disabled, even with a key 2ms
+ ✓ app/src/ai.test.ts > uses a caller key with openai-compatible only after opt-in 21ms
+ ✓ app/src/ai.test.ts > uses a caller key with anthropic only after opt-in 1ms
+ ✓ app/src/ai.test.ts > handles provider failure without changing the local engine 1ms
+ ✓ app/src/audit-learning.test.ts > extracts a document-grounded draft and includes the approved correction pair in the next model context 37ms
+ ✓ app/src/audit-learning.test.ts > does not call AI when disabled and rejects invented source quotes or verification claims 4ms
+ ✓ app/src/audit-learning.test.ts > stages proposals with verification reset and never mutates the original AI response 3ms
+ ✓ app/src/audit-learning.test.ts > matches only approved lessons for the correct origin, coverage, dates and class 1ms
+ ✓ app/src/audit-learning.test.ts > accepts an Anthropic structured draft and refuses malformed model output without applying it 3ms
+ ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > initializes and discovers eight typed tools with safe annotations 19ms
+ ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > calls WC and GL through MCP with structured calculation results 6ms
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > rejects invalid inputs rather than silently converting them 1ms
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > returns checklist and source rules with disclaimers 2ms
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > searches and fetches public guides without arbitrary file access 1ms
  ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > publishes resources and a preparation prompt 4ms
- ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > reviews supplied case data and returns a draft without submitting it 3ms
- ✓ mcp/server.test.ts > real MCP transports > negotiates over an actual stdio subprocess with clean stdout 567ms
- ✓ mcp/server.test.ts > real MCP transports > negotiates local Streamable HTTP and blocks hostile origins and hosts 96ms
- ✓ tests/benchmark-cli.test.ts > runs an actual offline subprocess into private files and refuses in-repository output 1424ms
+ ✓ mcp/server.test.ts > MCP protocol and audit tool contracts > reviews supplied case data and returns a draft without submitting it 4ms
+ ✓ mcp/server.test.ts > real MCP transports > negotiates over an actual stdio subprocess with clean stdout 470ms
+ ✓ mcp/server.test.ts > real MCP transports > negotiates local Streamable HTTP and blocks hostile origins and hosts 68ms
+ ✓ tests/backend.test.ts > requires verified email, phone and explicit current terms; legacy acknowledgments cannot bypass 59ms
+ ✓ tests/benchmark-cli.test.ts > runs an actual offline subprocess into private files and refuses in-repository output 1281ms
  ✓ tests/benchmark-cli.test.ts > rejects paths and directory junctions resolving back into the repository 4ms
- ✓ tests/backend.test.ts > requires verified email, phone and explicit current terms; legacy acknowledgments cannot bypass 189ms
- ✓ tests/backend.test.ts > isolates private uploads, records explicit consent changes and deletes active files/account 973ms
- ✓ tests/backend.test.ts > rejects cross-origin writes and code brute force 143ms
- ✓ tests/backend.test.ts > publishes OAuth/PKCE discovery and challenges unauthenticated MCP calls 7ms
+ ✓ tests/backend.test.ts > isolates private uploads, records explicit consent changes and deletes active files/account 226ms
+ ✓ tests/backend.test.ts > rejects cross-origin writes and code brute force 49ms
+ ✓ tests/backend.test.ts > publishes OAuth/PKCE discovery and challenges unauthenticated MCP calls 8ms
 stderr | tests/backend.test.ts > performs DCR, browser-bound consent, S256 code exchange, authenticated MCP and revocation
 OAuth error response: 400 invalid_grant - Authorization code already used
 
 stderr | tests/backend.test.ts > performs DCR, browser-bound consent, S256 code exchange, authenticated MCP and revocation
 OAuth error response: 401 invalid_token - Invalid access token
 
- ✓ tests/backend.test.ts > performs DCR, browser-bound consent, S256 code exchange, authenticated MCP and revocation 408ms
- ✓ tests/backend.test.ts > rejects unsafe redirects, plain PKCE and wrong resource, and supports explicit denial 259ms
- ✓ tests/backend.test.ts > isolates tenants, supports unlimited teammates, rejects stale saves and revokes access 1540ms
- ✓ tests/backend.test.ts > validates case bodies and removes owned cases when the account is deleted 404ms
- ✓ tests/backend.test.ts > atomically gates 50 GB storage, permits paid allowance, releases deleted bytes and blocks suspended tenants 743ms
- ✓ tests/backend.test.ts > restricts Sourcy controls to configured admins and prices recorded storage, infrastructure and LLM costs at 2x 550ms
- ✓ tests/backend.test.ts > captures learning for every saved revision, excludes drafts/private text, requires prospective permissions and suppresses small export groups 4025ms
+ ✓ tests/backend.test.ts > performs DCR, browser-bound consent, S256 code exchange, authenticated MCP and revocation 149ms
+ ✓ tests/backend.test.ts > rejects unsafe redirects, plain PKCE and wrong resource, and supports explicit denial 83ms
+ ✓ tests/backend.test.ts > isolates tenants, supports unlimited teammates, rejects stale saves and revokes access 624ms
+ ✓ tests/backend.test.ts > validates case bodies and removes owned cases when the account is deleted 112ms
+ ✓ tests/backend.test.ts > atomically gates 50 GB storage, permits paid allowance, releases deleted bytes and blocks suspended tenants 232ms
+ ✓ tests/backend.test.ts > restricts Sourcy controls to configured admins and prices recorded storage, infrastructure and LLM costs at 2x 144ms
+ ✓ tests/backend.test.ts > captures learning for every saved revision, excludes drafts/private text, requires prospective permissions and suppresses small export groups 1093ms
+ ✓ tests/backend.test.ts > keeps corrections in draft until source-checked owner approval, scopes later reuse and withdraws stale lessons 371ms
+ ✓ tests/backend.test.ts > records an immutable original/corrected review snapshot and rejects changed cases, secrets and foreign lessons 181ms
+ ✓ tests/backend.test.ts > retains the exact approved lesson revision in a review snapshot and rejects it after editing 144ms
 
- Test Files  9 passed (9)
-      Tests  75 passed (75)
-   Start at  21:56:20
-   Duration  12.09s (tests 84%, import 11%, transform 5%)
+ Test Files  10 passed (10)
+      Tests  83 passed (83)
+   Start at  22:46:25
+   Duration  4.92s (tests 73%, import 22%, transform 4%, worker 1%)

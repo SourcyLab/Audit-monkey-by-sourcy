@@ -6,6 +6,8 @@ Each saved audit revision atomically records broad learning features. Drafts and
 
 A separate offline structured benchmark supports redacted real-client inputs and independently verified references, with private output paths, premium/balance/category/timing comparisons and strict separation from synthetic controls. It does not start the development-login app, upload, call AI, train or sell. No actual client cohort has been measured yet.
 
+The checked teaching loop now adds optional source-quoted AI drafts, explicit staff correction, immutable original/corrected snapshots and owner-approved tenant correction memory for later matching reviews. Draft/retired/rejected/out-of-scope lessons are excluded. It is retrieval-based service memory, not automatic fine-tuning or changes to the numerical engine. The synthetic mock test proves context reuse only; real client improvement remains unmeasured.
+
 The code remains on initial-build and PR #1, with README-only main untouched. Code and docs retain their separate noncommercial licenses. Branding uses approved assets. No deployment, merge, DNS change, real email, actual payment, buyer transfer or live-client record processing occurred.
 
 Before hosted real-client pilot: authorize deployment and provision real private resources/HTTPS/email; resolve operational security, backup/recovery/retention, legal/privacy and subscription verification. Actual provider approval is separate from MCP tests. See the pilot runbook and verification reports for precisely tested behavior and limits.

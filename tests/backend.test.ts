@@ -56,7 +56,7 @@ const registration = (email: string) => ({
   email,
   phone: "+12025550123",
   termsAccepted: true,
-  termsVersion: "2026-11-01-v3",
+  termsVersion: "2026-11-01-v4",
   aiTrainingConsent: false,
   thirdPartyTrainingSaleConsent: false,
 });
@@ -88,6 +88,7 @@ beforeAll(async () => {
     "0004_costs.sql",
     "0005_learning.sql",
     "0006_billing_sources.sql",
+    "0007_review_memory.sql",
   ])
     await db.exec(await readFile("backend/migrations/" + name, "utf8"));
 });
@@ -874,4 +875,370 @@ it("captures learning for every saved revision, excludes drafts/private text, re
     .bind(c.id)
     .first();
   expect(last).toEqual({ training_eligible: 0, sale_eligible: 0 });
+});
+it("keeps corrections in draft until source-checked owner approval, scopes later reuse and withdraws stale lessons", async () => {
+  const owner = await login("teacher-owner@example.test"),
+    member = await login("teacher-member@example.test"),
+    outsider = await login("teacher-outsider@example.test");
+  const auditCase = sampleCase();
+  auditCase.fictional = false;
+  auditCase.wc[0].classCode = "1234";
+  const casePath = "/api/cases/" + auditCase.id;
+  await req(casePath, "PUT", { auditCase, revision: 0 }, owner.cookie);
+  await req(
+    "/api/tenants/members",
+    "POST",
+    { email: "teacher-member@example.test" },
+    owner.cookie,
+  );
+  const shared = { "X-Tenant-ID": owner.userId };
+  const payload = {
+    title: "Check extra OT premium",
+    topic: "overtime",
+    line: "wc",
+    state: "FL",
+    originalFinding: "Earlier draft counted all overtime.",
+    correctedFinding:
+      "Only remove documented extra overtime premium after checking the applicable policy and manual authority.",
+    sourceReference: "Fictional reviewed policy/manual authority page 1",
+    classCodes: ["1234"],
+    effectiveFrom: "2025-01-01",
+    effectiveTo: "2026-01-01",
+  };
+  const created = await req(
+    "/api/corrections",
+    "POST",
+    { caseId: auditCase.id, caseRevision: 1, runId: null, payload },
+    member.cookie,
+    shared,
+  );
+  expect(created.status).toBe(201);
+  const lesson = (await created.json()) as { id: string; revision: number };
+  const context = {
+    line: "wc",
+    start: "2025-01-01",
+    end: "2026-01-01",
+    classCodes: ["1234"],
+    synthetic: false,
+    topics: ["overtime"],
+  };
+  const matches = async (body = context, cookie = owner.cookie, headers = {}) =>
+    (await (
+      await req("/api/corrections/match", "POST", body, cookie, headers)
+    ).json()) as { lessons: { id: string; revision: number }[] };
+  expect((await matches()).lessons).toEqual([]);
+  expect(
+    (
+      await req(
+        "/api/corrections/" + lesson.id,
+        "PATCH",
+        { revision: 1, action: "edit", payload: { ...payload, line: "gl" } },
+        member.cookie,
+        shared,
+      )
+    ).status,
+  ).toBe(400);
+  expect(
+    (
+      await req(
+        "/api/corrections/" + lesson.id,
+        "PATCH",
+        {
+          revision: 1,
+          action: "approve",
+          sourceVerified: true,
+          reuseConfirmed: true,
+        },
+        member.cookie,
+        shared,
+      )
+    ).status,
+  ).toBe(403);
+  expect(
+    (
+      await req(
+        "/api/corrections/" + lesson.id,
+        "PATCH",
+        { revision: 1, action: "approve" },
+        owner.cookie,
+      )
+    ).status,
+  ).toBe(400);
+  expect(
+    (
+      await req(
+        "/api/corrections/" + lesson.id,
+        "PATCH",
+        {
+          revision: 1,
+          action: "approve",
+          sourceVerified: true,
+          reuseConfirmed: true,
+        },
+        owner.cookie,
+      )
+    ).status,
+  ).toBe(200);
+  expect((await matches()).lessons[0]).toMatchObject({
+    id: lesson.id,
+    revision: 2,
+  });
+  expect((await matches({ ...context, synthetic: true })).lessons).toEqual([]);
+  expect((await matches({ ...context, classCodes: ["9999"] })).lessons).toEqual(
+    [],
+  );
+  expect((await matches({ ...context, end: "2027-01-01" })).lessons).toEqual(
+    [],
+  );
+  expect((await matches(context, outsider.cookie)).lessons).toEqual([]);
+  expect(
+    (
+      await req(
+        "/api/corrections/" + lesson.id,
+        "GET",
+        undefined,
+        outsider.cookie,
+      )
+    ).status,
+  ).toBe(404);
+  expect(
+    (
+      await req(
+        "/api/corrections/" + lesson.id,
+        "PATCH",
+        { revision: 1, action: "retire" },
+        owner.cookie,
+      )
+    ).status,
+  ).toBe(409);
+  expect(
+    (
+      await req(
+        "/api/corrections/" + lesson.id,
+        "PATCH",
+        {
+          revision: 2,
+          action: "edit",
+          payload: {
+            ...payload,
+            correctedFinding:
+              "Revised teaching correction supported by reviewed records.",
+          },
+        },
+        owner.cookie,
+      )
+    ).status,
+  ).toBe(200);
+  expect((await matches()).lessons).toEqual([]);
+  expect(
+    (
+      await req(
+        "/api/corrections/" + lesson.id,
+        "PATCH",
+        {
+          revision: 3,
+          action: "approve",
+          sourceVerified: true,
+          reuseConfirmed: true,
+        },
+        owner.cookie,
+      )
+    ).status,
+  ).toBe(200);
+  expect(
+    (
+      await req(
+        "/api/corrections/" + lesson.id,
+        "PATCH",
+        { revision: 4, action: "retire" },
+        owner.cookie,
+      )
+    ).status,
+  ).toBe(200);
+  expect((await matches()).lessons).toEqual([]);
+  const db = await mf.getD1Database("DB"),
+    events = await db
+      .prepare(
+        "SELECT status,revision FROM correction_events WHERE correction_id=? ORDER BY revision",
+      )
+      .bind(lesson.id)
+      .all();
+  expect(events.results.map((e) => e.status)).toEqual([
+    "draft",
+    "approved",
+    "draft",
+    "approved",
+    "retired",
+  ]);
+});
+it("records an immutable original/corrected review snapshot and rejects changed cases, secrets and foreign lessons", async () => {
+  const a = await login("snapshot-owner@example.test"),
+    c = sampleCase();
+  const path = "/api/cases/" + c.id;
+  await req(path, "PUT", { auditCase: c, revision: 0 }, a.cookie);
+  const draft = {
+    summary: "Fictional review draft",
+    wc: [],
+    gl: [],
+    mods: [],
+    steps: [],
+    totals: { carrierFinal: null, deposit: null, sourceQuote: null },
+    findings: [],
+  };
+  const body = {
+    caseId: c.id,
+    caseRevision: 1,
+    provider: "openai-compatible",
+    model: "fake-model",
+    inputHash: "a".repeat(64),
+    draft,
+    lessons: [],
+  };
+  expect(
+    (
+      await req(
+        "/api/audit-runs",
+        "POST",
+        { ...body, key: "DO-NOT-STORE" },
+        a.cookie,
+      )
+    ).status,
+  ).toBe(400);
+  const saved = await req("/api/audit-runs", "POST", body, a.cookie);
+  expect(saved.status).toBe(201);
+  const run = (await saved.json()) as { id: string };
+  const snapshot = (await (
+    await req("/api/audit-runs/" + run.id, "GET", undefined, a.cookie)
+  ).json()) as {
+    payload: { draft: unknown; correctedWorksheet: { policy: unknown } };
+  };
+  expect(snapshot.payload.draft).toEqual(draft);
+  expect(snapshot.payload.correctedWorksheet.policy).toEqual(c.policy);
+  c.policy.deposit = 123;
+  await req(path, "PUT", { auditCase: c, revision: 1 }, a.cookie);
+  expect((await req("/api/audit-runs", "POST", body, a.cookie)).status).toBe(
+    409,
+  );
+  expect(
+    (
+      await req(
+        "/api/audit-runs",
+        "POST",
+        {
+          ...body,
+          caseRevision: 2,
+          lessons: [
+            { id: "11111111-1111-4111-8111-111111111111", revision: 1 },
+          ],
+        },
+        a.cookie,
+      )
+    ).status,
+  ).toBe(409);
+  expect(
+    (await req("/api/audit-runs/" + run.id, "PATCH", {}, a.cookie)).status,
+  ).toBe(405);
+  const old = (await (
+    await req("/api/audit-runs/" + run.id, "GET", undefined, a.cookie)
+  ).json()) as {
+    payload: { correctedWorksheet: { policy: { deposit: number } } };
+  };
+  expect(old.payload.correctedWorksheet.policy.deposit).toBe(4500);
+  await req("/api/cases/" + c.id, "DELETE", undefined, a.cookie, {
+    "If-Match": "2",
+  });
+  expect(
+    (await req("/api/audit-runs/" + run.id, "GET", undefined, a.cookie)).status,
+  ).toBe(404);
+});
+it("retains the exact approved lesson revision in a review snapshot and rejects it after editing", async () => {
+  const a = await login("versioned-memory@example.test"),
+    c = sampleCase();
+  await req(
+    "/api/cases/" + c.id,
+    "PUT",
+    { auditCase: c, revision: 0 },
+    a.cookie,
+  );
+  const payload = {
+    title: "Versioned review lesson",
+    topic: "overtime",
+    line: "wc",
+    state: "FL",
+    originalFinding: "Earlier synthetic review missed a question.",
+    correctedFinding:
+      "Check supported premium-only overtime against the actual current policy and payroll records.",
+    sourceReference: "Fictional reviewed source page 2",
+    classCodes: [],
+    effectiveFrom: "2025-01-01",
+    effectiveTo: "2026-01-01",
+  };
+  const lesson = (await (
+    await req(
+      "/api/corrections",
+      "POST",
+      { caseId: c.id, caseRevision: 1, runId: null, payload },
+      a.cookie,
+    )
+  ).json()) as { id: string };
+  expect(
+    (
+      await req(
+        "/api/corrections/" + lesson.id,
+        "PATCH",
+        {
+          revision: 1,
+          action: "approve",
+          sourceVerified: true,
+          reuseConfirmed: true,
+        },
+        a.cookie,
+      )
+    ).status,
+  ).toBe(200);
+  const draft = {
+      summary: "Synthetic original",
+      wc: [],
+      gl: [],
+      mods: [],
+      steps: [],
+      totals: { carrierFinal: null, deposit: null, sourceQuote: null },
+      findings: [],
+    },
+    body = {
+      caseId: c.id,
+      caseRevision: 1,
+      provider: "openai-compatible",
+      model: "fake-model",
+      inputHash: "b".repeat(64),
+      draft,
+      lessons: [{ id: lesson.id, revision: 2 }],
+    };
+  const created = await req("/api/audit-runs", "POST", body, a.cookie);
+  expect(created.status).toBe(201);
+  const run = (await created.json()) as { id: string };
+  await req(
+    "/api/corrections/" + lesson.id,
+    "PATCH",
+    {
+      revision: 2,
+      action: "edit",
+      payload: {
+        ...payload,
+        correctedFinding:
+          "New correction requires its own explicit source approval before use.",
+      },
+    },
+    a.cookie,
+  );
+  expect((await req("/api/audit-runs", "POST", body, a.cookie)).status).toBe(
+    409,
+  );
+  const original = (await (
+    await req("/api/audit-runs/" + run.id, "GET", undefined, a.cookie)
+  ).json()) as {
+    payload: { lessons: { revision: number; payload: unknown }[] };
+  };
+  expect(original.payload.lessons[0].revision).toBe(2);
+  expect(original.payload.lessons[0].payload).toEqual(payload);
 });

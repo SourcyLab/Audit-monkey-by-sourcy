@@ -20,6 +20,12 @@ Open **http://localhost:8787**. This performs npm ci, builds the static app, cre
 
 Enter a fictional email, phone and accept the current terms. In local development only, the sign-in code is displayed in the browser; no email is sent. Development mode refuses public hostnames. Use fictional records only. The first audit case is a fictional demo with made-up rates/classes. New case starts your own worksheet. See [backend setup and limits](backend/README.md).
 
+## Feed, check and improve future reviews
+
+Under **Review the audit → Feed, check & improve**, select redacted text from a PDF or paste an excerpt. Optional BYOK AI drafts source-quoted questions and exposure/premium proposals. Staff checks/corrects the worksheet, saves it and records an immutable original-versus-corrected comparison. Submit a redacted correction with source authority and applicability; the tenant owner must explicitly approve reuse. The next review retrieves up to eight matching approved corrections within that tenant, scoped by FL, line, classes, policy period and synthetic/client origin. Editing removes approval; retired/rejected/draft lessons are not retrieved. No math rules or model weights change automatically. [Staff teaching workflow](docs/checked-learning-loop.md).
+
+Manual tools remain complete without AI; approved corrections can be displayed as reminders. Snapshot/lesson content is private service data and counts toward storage, separate from optional external training/sale consent. Keys are excluded from snapshots and case JSON. Synthetic browser testing verifies the wiring, not real-model/client improvement.
+
 ## Start a private real-client benchmark
 
 A separate **offline structured benchmark** can compare redacted WC/GL figures against independently human-verified references without starting the development-login web app or uploading records. Run `npm run benchmark -- --init <private-file.json>`, then `npm run benchmark -- --input <private-file.json> --out <private-output-folder>`. Inputs and outputs must stay outside this public checkout. The generated template is synthetic; real accuracy has not been established. Reports separate real/synthetic cohorts, compare premium/balance and candidate-adjustment categories, and record staff timing and unassessed review. No AI, training, sale or carrier submission occurs. See the [real-client benchmark procedure](docs/real-client-benchmark.md). Identifiable uploads/live employee collaboration still require the hosted-pilot safeguards.
@@ -44,7 +50,7 @@ Audit edits stay in browser memory unless you explicitly save the active case to
 - **Cases:** staff assignment, work stage, follow-up, internal notes, carrier outcomes, schema-validated JSON export/import, tenant backend save/recovery, conflict detection and isolated optional browser storage. Internal notes are excluded from carrier drafts.
 - **Guides:** [prepare](guides/prepare.md), [review](guides/review.md), [dispute](guides/dispute.md), [WC](guides/wc.md), [GL](guides/gl.md), [Florida](guides/states/fl.md), [glossary](guides/glossary.md), [templates](guides/templates/README.md), [AI prompts](prompts/README.md).
 
-PDFs extract text only: financial inputs must be verified and entered manually or imported through the WC/GL CSV templates. CSV imports replace the selected line’s rows and clear verification; they do not infer classes, coverage or exclusions. Scans need separate OCR. The tool does not independently decide classifications, coverage, authority or an allowed exclusion. Enter verified policy rates; no carrier rates or proprietary NCCI/ISO tables are shipped. Caps, assessment values and deadlines remain TODO until verified. See [calculation model](docs/calculation-model.md).
+PDF.js extracts text locally. Inputs can be entered manually, imported through WC/GL CSV templates, or proposed by the optional source-quoted AI draft, with verification cleared on import. CSV imports replace the selected line’s rows and clear verification; they do not infer classes, coverage or exclusions. Scans need separate OCR. The tool does not independently decide classifications, coverage, authority or an allowed exclusion. Enter verified policy rates; no carrier rates or proprietary NCCI/ISO tables are shipped. Caps, assessment values and deadlines remain TODO until verified. See [calculation model](docs/calculation-model.md).
 
 ## Tenant storage, billing and learning
 
@@ -54,7 +60,7 @@ Every saved case revision creates an atomic structured learning event. Human ver
 
 ## Optional BYOK AI
 
-AI is off by default. Under Sources & guides select OpenAI-compatible or Anthropic, enter your own endpoint/model/key, review selected text, then press Send. Keys/settings stay in session memory, are not hosted, saved or exported, and clear on reload. Provider calls may incur charges and send selected text under that provider’s terms. They are separate from Sourcy Inc's training/sale permissions. No background provider requests occur. Provider/CORS errors leave local audit tools available.
+AI is off by default. Under Sources & guides select OpenAI-compatible or Anthropic, enter your own endpoint/model/key, review selected text, then press Send. Audit-review requests have their own sharing confirmation and may include applicable approved tenant corrections. Keys/settings stay in session memory, are not hosted, saved or exported, and clear on reload. Provider calls may incur charges and send selected text under that provider’s terms. They are separate from Sourcy Inc's training/sale permissions. No background provider requests occur. Provider/CORS errors leave local audit tools available.
 
 ## MCP login and compatibility
 

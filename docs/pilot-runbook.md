@@ -28,6 +28,10 @@ Install Node 24 with npm, then run `npm start` from the repository root. Open ht
 9. In **Dispute packet**, review outstanding checks and download Markdown or the printable HTML findings/letter draft. Open HTML in a browser and Print → Save as PDF. Attach actual evidence yourself. Nothing is sent automatically. Confirm deadlines and any collection hold with the carrier; filing a complaint does not itself extend a deadline.
 10. When the carrier responds, record review category, outcome, source/page and reviewer. Check outcome verification only against a written response, then save. Each saved revision creates an atomic learning event. Drafts are not treated as verified training truth. No model retrains itself.
 
+## Teach a later review
+
+Use the [checked learning loop](checked-learning-loop.md): feed redacted audit text, request an optional source-quoted draft, correct the worksheet, save and record the original/corrected snapshot, submit a source-backed correction and obtain explicit owner approval. The next matching audit can use that approved lesson. Retrieval is tenant-local; no underlying model weights or premium rules automatically change. Real provider/client improvement remains to be measured.
+
 ## Sourcy pilot administration
 
 The privileged allowlist is `SOURCY_ADMIN_EMAILS`, empty in source control. Configure approved admin emails server-side; client input cannot grant this role. Use real verified email and additional operational access protection before hosted use. A fictional allowlist may be passed only to a loopback test server, never published.

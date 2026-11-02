@@ -1,3 +1,4 @@
+import { reviewMemoryAPI } from "./review-memory";
 import { ensureTenant, tenantFor, tenantAPI } from "./tenants";
 import { adminAPI, sourcyAdmin } from "./admin";
 import { caseAPI } from "./cases";
@@ -290,6 +291,18 @@ async function app(req: Request, env: Bindings): Promise<Response> {
     const user = await requireSession(req, env);
     return adminAPI(req, env.DB, user, env.SOURCY_ADMIN_EMAILS, () =>
       data(req),
+    );
+  }
+  if (
+    path === "/api/audit-runs" ||
+    path.startsWith("/api/audit-runs/") ||
+    path === "/api/corrections" ||
+    path.startsWith("/api/corrections/")
+  ) {
+    const user = await requireSession(req, env),
+      tenant = await tenantFor(req, env.DB, user);
+    return reviewMemoryAPI(req, env.DB, user, tenant, async () =>
+      JSON.parse(new TextDecoder().decode(await bounded(req, 512 * 1024))),
     );
   }
   if (path === "/api/cases" || path.startsWith("/api/cases/")) {

@@ -21,7 +21,8 @@
     "pretest": "npm run build && npm run build:api",
     "test:pilot-browser": "node scripts/pilot-browser-check.mjs",
     "verify:browser": "node scripts/verify-browser.mjs",
-    "benchmark": "tsx scripts/benchmark.ts"
+    "benchmark": "tsx scripts/benchmark.ts",
+    "test:learning-browser": "node scripts/learning-browser-check.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

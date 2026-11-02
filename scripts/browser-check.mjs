@@ -165,7 +165,7 @@ try {
     })
     .click();
   assert.match(
-    await page.locator("pre").innerText(),
+    await page.locator("#worksheet-text").innerText(),
     /FICTIONAL AUDIT WORKSHEET/,
   );
   await page.getByRole("heading", { name: "Follow the money" }).waitFor();
@@ -330,13 +330,11 @@ try {
   const csvText = Buffer.concat(csvParts)
     .toString()
     .replace("Example employee", "Fictional CSV Employee");
-  await page
-    .locator("#exposure-csv")
-    .setInputFiles({
-      name: "fictional-exposure.csv",
-      mimeType: "text/csv",
-      buffer: Buffer.from(csvText),
-    });
+  await page.locator("#exposure-csv").setInputFiles({
+    name: "fictional-exposure.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from(csvText),
+  });
   await page.locator("#status").filter({ hasText: "CSV imported" }).waitFor();
   assert.equal(
     await page.locator('[data-path="wc.0.name"]').inputValue(),

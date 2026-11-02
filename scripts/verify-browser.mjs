@@ -85,6 +85,9 @@ try {
   await run("scripts/pilot-browser-check.mjs", [], {
     AUDIT_PILOT_BASE_URL: base,
   });
+  await run("scripts/learning-browser-check.mjs", [], {
+    AUDIT_PILOT_BASE_URL: base,
+  });
 } finally {
   server.kill("SIGTERM");
 }
